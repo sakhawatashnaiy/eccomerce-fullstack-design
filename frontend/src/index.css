@@ -20,4 +20,51 @@
     .animate-cart-pop {
         animation: cart-pop 220ms ease-out;
     }
+
+    /* Navbar brand decorative before/after dots */
+    @keyframes nav-dot-orbit {
+        0% {
+            transform: translateX(0) scale(1);
+            opacity: 0.6;
+        }
+        50% {
+            transform: translateX(6px) scale(1.1);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(0) scale(1);
+            opacity: 0.6;
+        }
+    }
+
+    .navbar-brand-animated {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding-inline-start: 1.25rem;
+    }
+
+    .navbar-brand-animated::before,
+    .navbar-brand-animated::after {
+        content: "";
+        position: absolute;
+        inset-block-start: 50%;
+        transform: translateY(-50%);
+        border-radius: 9999px;
+        width: 0.45rem;
+        height: 0.45rem;
+        background-image: linear-gradient(135deg, #0f172a, #1d4ed8);
+        box-shadow: 0 0 0.35rem rgba(15, 23, 42, 0.5);
+    }
+
+    .navbar-brand-animated::before {
+        inset-inline-start: 0;
+        animation: nav-dot-orbit 1.6s ease-in-out infinite;
+    }
+
+    .navbar-brand-animated::after {
+        inset-inline-start: 0.55rem;
+        opacity: 0.4;
+    }
 }

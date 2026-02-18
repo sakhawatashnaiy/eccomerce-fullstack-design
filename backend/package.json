@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend fullstack eccomerce",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "seed:products": "node src/scripts/seedProducts.js",
+    "test": "echo \"No tests configured yet\""
+  },
+  "dependencies": {
+    "cloudinary": "^2.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.5.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sakhawatashnaiy/eccomerce-fullstack-design.git"
+  },
+  "author": "sakhawat hussain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sakhawatashnaiy/eccomerce-fullstack-design/issues"
+  },
+  "homepage": "https://github.com/sakhawatashnaiy/eccomerce-fullstack-design#readme"
+}

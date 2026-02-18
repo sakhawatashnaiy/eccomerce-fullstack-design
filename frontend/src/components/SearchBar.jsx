@@ -2,9 +2,15 @@
  * Stateless search input UI.
  * Currently prevents submit; wire it to filtering/search state as needed.
  */
-export default function SearchBar({ placeholder = 'Search' }) {
+export default function SearchBar({ placeholder = 'Search', value = '', onChange, onSubmit }) {
 	return (
-		<form onSubmit={(e) => e.preventDefault()} className="w-full">
+		<form
+			onSubmit={(e) => {
+				e.preventDefault()
+				onSubmit?.(value)
+			}}
+			className="w-full"
+		>
 			<label className="sr-only" htmlFor="search">
 				Search
 			</label>
@@ -31,6 +37,8 @@ export default function SearchBar({ placeholder = 'Search' }) {
 					id="search"
 					type="search"
 					placeholder={placeholder}
+					value={value}
+					onChange={(e) => onChange?.(e.target.value)}
 					className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"
 				/>
 			</div>

@@ -9,6 +9,7 @@ import ProductListing from '../pages/productListing.jsx'
 import ProductDetails from '../pages/productDetails.jsx'
 import Cart from '../pages/Cart.jsx'
 import Checkout from '../pages/checkout.jsx'
+import AdminProducts from '../pages/AdminProducts.jsx'
 
 export default function AppRoutes() {
 	return (
@@ -18,6 +19,7 @@ export default function AppRoutes() {
 			<Route path="/product/:id" element={<ProductDetails />} />
 			<Route path="/cart" element={<Cart />} />
 			<Route path="/checkout" element={<Checkout />} />
+			<Route path="/admin/products" element={<AdminProducts />} />
 		</Routes>
 	)
 }

@@ -3,11 +3,12 @@
  * Finds a product by route param `id`, tracks recently viewed, and allows add-to-cart.
  */
 import { Link, useParams } from 'react-router-dom'
+import { useEffect } from 'react'
 import Footer from '../components/Footer.jsx'
 import Navbar from '../components/Navbar.jsx'
-import { products } from '../data/products.js'
 import { addToCart } from '../utils/cart.js'
 import { addRecentlyViewed } from '../utils/recentlyViewed.js'
+import { useGetProductByIdQuery } from '../services/apiSlice.js'
 
 function formatMoney(value) {
 	try {
@@ -23,11 +24,11 @@ function formatMoney(value) {
 
 export default function ProductDetails() {
 	const { id } = useParams()
-	const product = products.find((p) => p.id === id)
+	const { data: product, isLoading, isError } = useGetProductByIdQuery(id)
 
-	if (product) {
-		addRecentlyViewed(product.id)
-	}
+	useEffect(() => {
+		if (product?.id) addRecentlyViewed(product.id)
+	}, [product?.id])
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">
@@ -40,16 +41,20 @@ export default function ProductDetails() {
 						</Link>
 					</div>
 
-					{!product ? (
+					{isLoading ? (
+						<div className="rounded-2xl border border-slate-200 bg-white p-6">
+							<h1 className="text-xl font-semibold text-slate-900">Loading product...</h1>
+						</div>
+					) : isError || !product ? (
 						<div className="rounded-2xl border border-slate-200 bg-white p-6">
 							<h1 className="text-xl font-semibold text-slate-900">Product not found</h1>
-							<p className="mt-2 text-sm text-slate-600">This product may have been removed.</p>
+							<p className="mt-2 text-sm text-slate-600">This product may have been removed or backend is offline.</p>
 						</div>
 					) : (
 						<div className="grid gap-8 lg:grid-cols-12">
 							<div className="lg:col-span-7">
 								<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-									<div className="aspect-[4/3] bg-slate-100">
+									<div className="aspect-[2/2] object-fit bg-slate-100">
 										<img src={product.image} alt={product.name} className="h-full w-full object-cover" />
 									</div>
 								</div>

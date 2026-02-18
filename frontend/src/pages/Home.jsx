@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { products } from '../data/products.js'
 import { getRecentlyViewedIds } from '../utils/recentlyViewed.js'
+import { useGetProductsQuery } from '../services/apiSlice.js'
 
 function parseDate(value) {
 	const d = new Date(value)
@@ -59,7 +59,7 @@ const promoSlides = [
 		subtitle: 'Make a faster upgrade with curated picks, clean specs, and honest pricing.',
 		cta1: { label: 'Shop now', to: '/products' },
 		cta2: { label: 'Browse categories', to: '#categories' },
-		image: products[0]?.image,
+		image: null,
 	},
 	{
 		tag: 'New arrivals',
@@ -67,7 +67,7 @@ const promoSlides = [
 		subtitle: 'Fresh gadgets and essentials sorted by newest first — designed to convert.',
 		cta1: { label: 'See new arrivals', to: '#latest' },
 		cta2: { label: 'View all products', to: '/products' },
-		image: products[5]?.image,
+		image: null,
 	},
 	{
 		tag: 'Save more',
@@ -75,33 +75,38 @@ const promoSlides = [
 		subtitle: 'Grab selected deals before the countdown ends — limited stock.',
 		cta1: { label: 'View discounts', to: '#discounts' },
 		cta2: { label: 'Go to products', to: '/products' },
-		image: products[1]?.image,
+		image: null,
 	},
 ]
 
 export default function Home() {
 	const [slideIndex, setSlideIndex] = useState(0)
 	const [recentIds, setRecentIds] = useState(() => getRecentlyViewedIds())
+	const { data: allProducts = [], isLoading, isError } = useGetProductsQuery()
 
-	const featured = useMemo(() => getFeatured(products).slice(0, 8), [])
-	const latest = useMemo(() => getLatest(products).slice(0, 8), [])
-	const discounted = useMemo(() => getDiscounted(products).slice(0, 8), [])
-	const categories = useMemo(() => buildCategoryCards(products), [])
+	const featured = useMemo(() => getFeatured(allProducts).slice(0, 8), [allProducts])
+	const latest = useMemo(() => getLatest(allProducts).slice(0, 8), [allProducts])
+	const discounted = useMemo(() => getDiscounted(allProducts).slice(0, 8), [allProducts])
+	const categories = useMemo(() => buildCategoryCards(allProducts), [allProducts])
 
 	const recentlyViewed = useMemo(() => {
-		const byId = new Map(products.map((p) => [p.id, p]))
+		const byId = new Map(allProducts.map((p) => [p.id, p]))
 		return recentIds.map((id) => byId.get(id)).filter(Boolean).slice(0, 8)
-	}, [recentIds])
+	}, [allProducts, recentIds])
+
+	const slides = useMemo(() => {
+		return promoSlides.map((slide, index) => ({ ...slide, image: allProducts[index]?.image || null }))
+	}, [allProducts])
 
 	const discountEnd = useMemo(() => new Date('2026-03-01T00:00:00.000Z').getTime(), [])
 	const [timeLeft, setTimeLeft] = useState(() => formatTimeLeft(discountEnd - Date.now()))
 
 	useEffect(() => {
 		const id = window.setInterval(() => {
-			setSlideIndex((i) => (i + 1) % promoSlides.length)
+			setSlideIndex((i) => (i + 1) % slides.length)
 		}, 2000)
 		return () => window.clearInterval(id)
-	}, [])
+	}, [slides.length])
 
 	useEffect(() => {
 		const id = window.setInterval(() => {
@@ -120,12 +125,19 @@ export default function Home() {
 		}
 	}, [])
 
-	const slide = promoSlides[slideIndex]
+	const slide = slides[slideIndex]
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">
 			<Navbar />
 			<main>
+				{isError ? (
+					<div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+						<p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
+							Could not load products from backend. Showing page layout only.
+						</p>
+					</div>
+				) : null}
 				{/* Hero / promotional banner (first impression + conversion) */}
 				<section className="relative overflow-hidden bg-slate-950">
 					<div className="absolute inset-0 opacity-70">
@@ -181,7 +193,7 @@ export default function Home() {
 							</div>
 
 							<div className="mt-8 flex items-center gap-2">
-								{promoSlides.map((_, i) => (
+								{slides.map((_, i) => (
 									<button
 										key={i}
 										type="button"
@@ -198,17 +210,17 @@ export default function Home() {
 						</div>
 
 						<div className="lg:col-span-6">
-							<div className="relative overflow-hidden rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 sm:p-6">
+							<div className="relative  rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 sm:p-6">
 								<div className="absolute inset-5 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
 								{slide.image ? (
 									<img
 										src={slide.image}
 										alt="Promotion"
-										className="relative aspect-[4/3] w-full rounded-xl object-fit ring-1 ring-white/10"
+										className="relative aspect-[4/3] w-100  rounded-xl object-fit ring-1 ring-white/10"
 										loading="lazy"
 									/>
 								) : (
-									<div className="relative aspect-[4/3] w-full rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
+									<div className="relative aspect-[4/3] w-100 rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
 								)}
 								<div className="relative mt-4 flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
 									<p className="text-sm font-semibold text-white">Trusted checkout • Fast shipping</p>
@@ -277,11 +289,15 @@ export default function Home() {
 							</Link>
 						</div>
 
-						<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-							{featured.map((product) => (
-								<ProductCard key={product.id} product={product} />
-							))}
-						</div>
+						{isLoading ? (
+							<p className="mt-8 text-sm text-slate-600">Loading featured products...</p>
+						) : (
+							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								{featured.map((product) => (
+									<ProductCard key={product.id} product={product} />
+								))}
+							</div>
+						)}
 					</div>
 				</section>
 
@@ -298,11 +314,15 @@ export default function Home() {
 							</Link>
 						</div>
 
-						<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-							{latest.map((product) => (
-								<ProductCard key={product.id} product={product} />
-							))}
-						</div>
+						{isLoading ? (
+							<p className="mt-8 text-sm text-slate-600">Loading latest products...</p>
+						) : (
+							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								{latest.map((product) => (
+									<ProductCard key={product.id} product={product} />
+								))}
+							</div>
+						)}
 					</div>
 				</section>
 
@@ -320,11 +340,15 @@ export default function Home() {
 							</div>
 						</div>
 
-						<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-							{discounted.map((product) => (
-								<ProductCard key={product.id} product={product} />
-							))}
-						</div>
+						{isLoading ? (
+							<p className="mt-8 text-sm text-slate-600">Loading discounts...</p>
+						) : (
+							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								{discounted.map((product) => (
+									<ProductCard key={product.id} product={product} />
+								))}
+							</div>
+						)}
 					</div>
 				</section>
 

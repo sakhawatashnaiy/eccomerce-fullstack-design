@@ -3,13 +3,25 @@
  * Includes search UI and a live-updating cart count via `utils/cart.js`.
  */
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SearchBar from './SearchBar.jsx'
 import { getCartCount } from '../utils/cart.js'
 
 export default function Navbar() {
+	const navigate = useNavigate()
 	const [isOpen, setIsOpen] = useState(false)
 	const [cartCount, setCartCount] = useState(() => getCartCount())
+	const [searchText, setSearchText] = useState('')
+
+	const submitSearch = (text) => {
+		const query = String(text || '').trim()
+		if (!query) {
+			navigate('/products')
+		} else {
+			navigate(`/products?search=${encodeURIComponent(query)}`)
+		}
+		setIsOpen(false)
+	}
 
 	useEffect(() => {
 		const refresh = () => setCartCount(getCartCount())
@@ -30,13 +42,19 @@ export default function Navbar() {
 					{/* <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-sm font-semibold text-white">
 						ES
 					</span> */}
-					<span className="font-sans pl-5 text-lg font-bold italic tracking-tight text-slate-950 sm:text-xl">
-					My Eccomerce store
+					<span className="navbar-brand-animated font-sans text-lg font-bold italic tracking-tight text-slate-950 transition-transform duration-300 hover:-translate-y-0.5 sm:text-xl">
+						My Eccomerce store
 					</span>
 				</a>
 
 				<div className="hidden flex-1 items-center gap-3 md:flex">
 					<nav className="flex items-center gap-6 text-sm font-medium text-slate-700">
+						<Link
+							to="/admin/products"
+							className="transition-colors duration-200 hover:text-slate-950 focus-visible:text-slate-950"
+						>
+							Admin
+						</Link>
 						{/* <a href="#categories" className="hover:text-slate-890 ml-1 focus-visible:text-slate-950">
 							Categories
 						</a>
@@ -48,7 +66,12 @@ export default function Navbar() {
 						</a> */}
 					</nav>
 					<div className="ml-auto w-full min-w-0 max-w-xs pr-5 sm:max-w-sm sm:pl-4 lg:max-w-md">
-						<SearchBar placeholder="Search products" />
+						<SearchBar
+							placeholder="Search products"
+							value={searchText}
+							onChange={setSearchText}
+							onSubmit={submitSearch}
+						/>
 					</div>
 				</div>
 
@@ -56,7 +79,7 @@ export default function Navbar() {
 					<div className="hidden items-center gap-1 md:flex">
 						<button
 							type="button"
-							className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+							className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100"
 							aria-label="Messages"
 						>
 							<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
@@ -77,7 +100,7 @@ export default function Navbar() {
 						</button>
 						<button
 							type="button"
-							className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+							className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100"
 							aria-label="Orders"
 						>
 							<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
@@ -106,7 +129,7 @@ export default function Navbar() {
 
 					<button
 						type="button"
-						className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 md:inline-flex md:items-center md:gap-2"
+						className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100 md:inline-flex md:items-center md:gap-2"
 						aria-label="Sign in"
 					>
 						<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
@@ -127,7 +150,7 @@ export default function Navbar() {
 					</button>
 					<Link
 						to="/cart"
-						className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-900"
+						className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-900"
 						aria-label="Open cart"
 					>
 						<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
@@ -144,14 +167,17 @@ export default function Navbar() {
 							/>
 						</svg>
 						<span className="hidden sm:inline">Cart</span>
-						<span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/15 px-1.5 text-xs">
+						<span
+							key={cartCount}
+							className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/15 px-1.5 text-xs animate-cart-pop"
+						>
 							{cartCount}
 						</span>
 					</Link>
 
 					<button
 						type="button"
-						className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 md:hidden"
+						className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 transition-colors duration-200 hover:bg-slate-100 md:hidden"
 						aria-label={isOpen ? 'Close menu' : 'Open menu'}
 						aria-expanded={isOpen}
 						onClick={() => setIsOpen((v) => !v)}
@@ -181,9 +207,17 @@ export default function Navbar() {
 				<div className="border-t border-slate-200 bg-white md:hidden">
 					<div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
 						<div className="mb-4">
-							<SearchBar placeholder="Search products" />
+							<SearchBar
+								placeholder="Search products"
+								value={searchText}
+								onChange={setSearchText}
+								onSubmit={submitSearch}
+							/>
 						</div>
 						<nav className="grid gap-2 text-sm font-semibold text-slate-800">
+							<Link to="/admin/products" className="rounded-lg px-3 py-2 hover:bg-slate-100" onClick={() => setIsOpen(false)}>
+								Admin
+							</Link>
 							<button
 								type="button"
 								className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-slate-100"
