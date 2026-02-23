@@ -3,6 +3,7 @@
  * Uses `utils/cart.js` for localStorage persistence and renders an order summary.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
@@ -26,6 +27,8 @@ function clampQty(value) {
 }
 
 export default function Cart() {
+	const shouldReduceMotion = useReducedMotion()
+	const MotionP = motion.p
 	const [items, setItems] = useState(() => getCartItems())
 	const [removing, setRemoving] = useState(() => new Set())
 	const [poppingId, setPoppingId] = useState(null)
@@ -208,9 +211,21 @@ export default function Cart() {
 															</div>
 
 															<div className={
-																'min-w-0 ' + (poppingId === id ? 'animate-cart-pop' : '')
+																'min-w-0'
 															}>
-																<p className="truncate text-sm font-semibold text-slate-900">{item?.name ?? 'Item'}</p>
+																<MotionP
+																	className="truncate text-sm font-semibold text-slate-900"
+																	animate={
+																		shouldReduceMotion
+																			? { opacity: 1 }
+																			: poppingId === id
+																				? { scale: [1, 1.03, 1] }
+																				: { scale: 1 }
+																	}
+																	transition={{ duration: 0.18, ease: 'easeOut' }}
+																>
+																	{item?.name ?? 'Item'}
+																</MotionP>
 																<p className="mt-1 text-sm text-slate-600">{formatMoney(price)} each</p>
 																<button
 																	type="button"

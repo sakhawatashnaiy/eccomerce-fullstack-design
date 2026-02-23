@@ -4,13 +4,21 @@
  */
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { getAuthToken } from '../utils/authSession.js'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1'
 
 export const apiSlice = createApi({
 	reducerPath: 'api',
-	baseQuery: fetchBaseQuery({ baseUrl: API_BASE_URL }),
-	tagTypes: ['Products'],
+	baseQuery: fetchBaseQuery({
+		baseUrl: API_BASE_URL,
+		prepareHeaders: (headers) => {
+			const token = getAuthToken()
+			if (token) headers.set('authorization', `Bearer ${token}`)
+			return headers
+		},
+	}),
+	tagTypes: ['Products', 'Orders'],
 	endpoints: (builder) => ({
 		getProducts: builder.query({
 			query: (params = {}) => {
@@ -47,6 +55,35 @@ export const apiSlice = createApi({
 			query: () => ({ url: '/products/seed', method: 'POST' }),
 			invalidatesTags: ['Products'],
 		}),
+		getMyOrders: builder.query({
+			query: () => '/orders/me',
+			transformResponse: (response) => response?.data ?? [],
+			providesTags: (result) =>
+				Array.isArray(result)
+					? [{ type: 'Orders', id: 'LIST' }, ...result.map((o) => ({ type: 'Orders', id: o?.id }))]
+					: [{ type: 'Orders', id: 'LIST' }],
+		}),
+		createMyOrder: builder.mutation({
+			query: (payload) => ({ url: '/orders/me', method: 'POST', body: payload }),
+			invalidatesTags: [{ type: 'Orders', id: 'LIST' }],
+		}),
+		getAdminOrders: builder.query({
+			query: () => '/orders/admin',
+			transformResponse: (response) => response?.data ?? [],
+			providesTags: (result) =>
+				Array.isArray(result)
+					? [{ type: 'Orders', id: 'LIST' }, ...result.map((o) => ({ type: 'Orders', id: o?.id }))]
+					: [{ type: 'Orders', id: 'LIST' }],
+		}),
+		getAdminOrderById: builder.query({
+			query: (id) => `/orders/admin/${id}`,
+			transformResponse: (response) => response?.data,
+			providesTags: (_result, _error, id) => [{ type: 'Orders', id }],
+		}),
+		patchAdminOrder: builder.mutation({
+			query: ({ id, ...patch }) => ({ url: `/orders/admin/${id}`, method: 'PATCH', body: patch }),
+			invalidatesTags: (_result, _error, { id }) => [{ type: 'Orders', id }, { type: 'Orders', id: 'LIST' }],
+		}),
 	}),
 })
 
@@ -57,5 +94,10 @@ export const {
 	useUpdateProductMutation,
 	useDeleteProductMutation,
 	useSeedProductsMutation,
+	useGetMyOrdersQuery,
+	useCreateMyOrderMutation,
+	useGetAdminOrdersQuery,
+	useGetAdminOrderByIdQuery,
+	usePatchAdminOrderMutation,
 } = apiSlice
 

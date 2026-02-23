@@ -2,7 +2,7 @@
  * Home / landing page.
  * Renders promo hero, featured sections, and recently-viewed items from localStorage.
  */
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
@@ -23,6 +23,137 @@ function formatTimeLeft(ms) {
 	const seconds = String(totalSeconds % 60).padStart(2, '0')
 	return `${hours}:${minutes}:${seconds}`
 }
+
+const HeroSlider = memo(function HeroSlider({ slides }) {
+	const safeSlides = Array.isArray(slides) && slides.length ? slides : promoSlides
+	const [slideIndex, setSlideIndex] = useState(0)
+
+	useEffect(() => {
+		if (!safeSlides.length) return
+		setSlideIndex((i) => i % safeSlides.length)
+	}, [safeSlides.length])
+
+	useEffect(() => {
+		if (!safeSlides.length) return
+		const id = window.setInterval(() => {
+			setSlideIndex((i) => (i + 1) % safeSlides.length)
+		}, 2000)
+		return () => window.clearInterval(id)
+	}, [safeSlides.length])
+
+	const slide = safeSlides[slideIndex] || safeSlides[0]
+
+	return (
+		<section className="relative overflow-hidden bg-slate-950">
+			<div className="absolute inset-0 opacity-70">
+				<div className="absolute -top-24 left-1/2 h-72 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-400 blur-3xl" />
+				<div className="absolute -bottom-24 left-1/4 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 to-lime-400 blur-3xl" />
+			</div>
+
+			<div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-12 lg:px-8 lg:py-20">
+				<div className="lg:col-span-6">
+					<p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white ring-1 ring-white/15">
+						<span className="h-2 w-2 rounded-full bg-emerald-400" />
+						{slide.tag}
+					</p>
+					<h1 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+						{slide.heading}
+					</h1>
+					<p className="mt-4 max-w-xl text-pretty text-base leading-7 text-slate-200 sm:text-lg">
+						{slide.subtitle}
+					</p>
+
+					<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+						{slide.cta1.to.startsWith('#') ? (
+							<a
+								href={slide.cta1.to}
+								className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
+							>
+								{slide.cta1.label}
+							</a>
+						) : (
+							<Link
+								to={slide.cta1.to}
+								className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
+							>
+								{slide.cta1.label}
+							</Link>
+						)}
+
+						{slide.cta2.to.startsWith('#') ? (
+							<a
+								href={slide.cta2.to}
+								className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
+							>
+								{slide.cta2.label}
+							</a>
+						) : (
+							<Link
+								to={slide.cta2.to}
+								className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
+							>
+								{slide.cta2.label}
+							</Link>
+						)}
+					</div>
+
+					<div className="mt-8 flex items-center gap-2">
+						{safeSlides.map((_, i) => (
+							<button
+								key={i}
+								type="button"
+								onClick={() => setSlideIndex(i)}
+								className={
+									i === slideIndex
+										? 'h-2.5 w-8 rounded-full bg-white/80'
+										: 'h-2.5 w-2.5 rounded-full bg-white/25 hover:bg-white/40'
+								}
+								aria-label={`Go to slide ${i + 1}`}
+							/>
+						))}
+					</div>
+				</div>
+
+				<div className="lg:col-span-6">
+					<div className="relative  rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 sm:p-6">
+						<div className="absolute inset-5 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+						{slide.image ? (
+							<img
+								src={slide.image}
+								alt="Promotion"
+								className="relative aspect-[4/3] w-full rounded-xl object-fit ring-1 ring-white/10"
+								loading="lazy"
+							/>
+						) : (
+							<div className="relative aspect-[4/3] w-100 rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
+						)}
+						<div className="relative mt-4 flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+							<p className="text-sm font-semibold text-white">Trusted checkout • Fast shipping</p>
+							<span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white ring-1 ring-white/15">
+								Secure
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	)
+})
+
+const DiscountCountdown = memo(function DiscountCountdown({ discountEndMs }) {
+	const [timeLeft, setTimeLeft] = useState(() => formatTimeLeft((Number(discountEndMs) || 0) - Date.now()))
+
+	useEffect(() => {
+		const id = window.setInterval(() => {
+			setTimeLeft(formatTimeLeft((Number(discountEndMs) || 0) - Date.now()))
+		}, 1000)
+		return () => window.clearInterval(id)
+	}, [discountEndMs])
+
+	return (
+		<p className="mt-1 font-mono text-lg font-semibold text-slate-900">{timeLeft}</p>
+	)
+})
 
 function getDiscounted(allProducts) {
 	return allProducts.filter((p) => typeof p.compareAtPrice === 'number' && p.compareAtPrice > p.price)
@@ -80,7 +211,6 @@ const promoSlides = [
 ]
 
 export default function Home() {
-	const [slideIndex, setSlideIndex] = useState(0)
 	const [recentIds, setRecentIds] = useState(() => getRecentlyViewedIds())
 	const { data: allProducts = [], isLoading, isError } = useGetProductsQuery()
 
@@ -99,21 +229,6 @@ export default function Home() {
 	}, [allProducts])
 
 	const discountEnd = useMemo(() => new Date('2026-03-01T00:00:00.000Z').getTime(), [])
-	const [timeLeft, setTimeLeft] = useState(() => formatTimeLeft(discountEnd - Date.now()))
-
-	useEffect(() => {
-		const id = window.setInterval(() => {
-			setSlideIndex((i) => (i + 1) % slides.length)
-		}, 2000)
-		return () => window.clearInterval(id)
-	}, [slides.length])
-
-	useEffect(() => {
-		const id = window.setInterval(() => {
-			setTimeLeft(formatTimeLeft(discountEnd - Date.now()))
-		}, 1000)
-		return () => window.clearInterval(id)
-	}, [discountEnd])
 
 	useEffect(() => {
 		const refresh = () => setRecentIds(getRecentlyViewedIds())
@@ -124,8 +239,6 @@ export default function Home() {
 			window.removeEventListener('storage', refresh)
 		}
 	}, [])
-
-	const slide = slides[slideIndex]
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">
@@ -139,99 +252,7 @@ export default function Home() {
 					</div>
 				) : null}
 				{/* Hero / promotional banner (first impression + conversion) */}
-				<section className="relative overflow-hidden bg-slate-950">
-					<div className="absolute inset-0 opacity-70">
-						<div className="absolute -top-24 left-1/2 h-72 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-400 blur-3xl" />
-						<div className="absolute -bottom-24 left-1/4 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 to-lime-400 blur-3xl" />
-					</div>
-
-					<div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-12 lg:px-8 lg:py-20">
-						<div className="lg:col-span-6">
-							<p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white ring-1 ring-white/15">
-								<span className="h-2 w-2 rounded-full bg-emerald-400" />
-								{slide.tag}
-							</p>
-							<h1 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-								{slide.heading}
-							</h1>
-							<p className="mt-4 max-w-xl text-pretty text-base leading-7 text-slate-200 sm:text-lg">
-								{slide.subtitle}
-							</p>
-
-							<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-								{slide.cta1.to.startsWith('#') ? (
-									<a
-										href={slide.cta1.to}
-										className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
-									>
-										{slide.cta1.label}
-									</a>
-								) : (
-									<Link
-										to={slide.cta1.to}
-										className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
-									>
-										{slide.cta1.label}
-									</Link>
-								)}
-
-								{slide.cta2.to.startsWith('#') ? (
-									<a
-										href={slide.cta2.to}
-										className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
-									>
-										{slide.cta2.label}
-									</a>
-								) : (
-									<Link
-										to={slide.cta2.to}
-										className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
-									>
-										{slide.cta2.label}
-									</Link>
-								)}
-							</div>
-
-							<div className="mt-8 flex items-center gap-2">
-								{slides.map((_, i) => (
-									<button
-										key={i}
-										type="button"
-										onClick={() => setSlideIndex(i)}
-										className={
-											i === slideIndex
-											? 'h-2.5 w-8 rounded-full bg-white/80'
-											: 'h-2.5 w-2.5 rounded-full bg-white/25 hover:bg-white/40'
-										}
-										aria-label={`Go to slide ${i + 1}`}
-									/>
-								))}
-							</div>
-						</div>
-
-						<div className="lg:col-span-6">
-							<div className="relative  rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 sm:p-6">
-								<div className="absolute inset-5 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
-								{slide.image ? (
-									<img
-										src={slide.image}
-										alt="Promotion"
-										className="relative aspect-[4/3] w-100  rounded-xl object-fit ring-1 ring-white/10"
-										loading="lazy"
-									/>
-								) : (
-									<div className="relative aspect-[4/3] w-100 rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
-								)}
-								<div className="relative mt-4 flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
-									<p className="text-sm font-semibold text-white">Trusted checkout • Fast shipping</p>
-									<span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white ring-1 ring-white/15">
-										Secure
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
+				<HeroSlider slides={slides} />
 
 				{/* Featured categories */}
 				<section id="categories" className="bg-white">
@@ -254,8 +275,10 @@ export default function Home() {
 									className="group rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300"
 								>
 									<div className="flex items-start justify-between gap-4">
-										<div>
-											<p className="text-base font-semibold text-slate-900">{c.name}</p>
+										<div className="min-w-0">
+											<p className="truncate text-base font-semibold text-slate-900" title={c.name}>
+												{c.name}
+											</p>
 											<p className="mt-1 text-sm text-slate-600">{c.count} items</p>
 										</div>
 										<span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 transition-colors group-hover:bg-slate-100">
@@ -336,7 +359,7 @@ export default function Home() {
 							</div>
 							<div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
 								<p className="text-xs font-semibold text-slate-600">Offer ends in</p>
-								<p className="mt-1 font-mono text-lg font-semibold text-slate-900">{timeLeft}</p>
+								<DiscountCountdown discountEndMs={discountEnd} />
 							</div>
 						</div>
 

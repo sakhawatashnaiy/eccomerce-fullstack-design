@@ -2,7 +2,13 @@
  * Orders controller.
  */
 
-const { readOrdersByUser, createOrderForUser } = require('./orders.service')
+const {
+	readOrdersByUser,
+	readAllOrders,
+	readOrderById,
+	createOrderForUser,
+	updateOrderById,
+} = require('./orders.service')
 
 async function listMyOrders(req, res) {
 	const data = await readOrdersByUser(req.user.uid)
@@ -14,4 +20,19 @@ async function createMyOrder(req, res) {
 	res.status(201).json({ ok: true, data })
 }
 
-module.exports = { listMyOrders, createMyOrder }
+async function listAllOrders(req, res) {
+	const data = await readAllOrders()
+	res.status(200).json({ ok: true, data })
+}
+
+async function getOrder(req, res) {
+	const data = await readOrderById(req.params.id)
+	res.status(200).json({ ok: true, data })
+}
+
+async function patchOrder(req, res) {
+	const data = await updateOrderById(req.params.id, req.body)
+	res.status(200).json({ ok: true, data })
+}
+
+module.exports = { listMyOrders, createMyOrder, listAllOrders, getOrder, patchOrder }

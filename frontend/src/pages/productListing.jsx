@@ -2,6 +2,7 @@
  * Product listing page.
  * Optionally filters by the `category` query param and renders a ProductCard grid.
  */
+import { useMemo } from 'react'
 import Footer from '../components/Footer.jsx'
 import Navbar from '../components/Navbar.jsx'
 import ProductCard from '../components/ProductCard.jsx'
@@ -13,10 +14,14 @@ export default function ProductListing() {
 	const activeCategory = searchParams.get('category')
 	const search = searchParams.get('search')
 
-	const { data: visibleProducts = [], isLoading, isError } = useGetProductsQuery({
-		category: activeCategory || undefined,
-		search: search || undefined,
-	})
+	const queryArgs = useMemo(() => {
+		return {
+			category: activeCategory || undefined,
+			search: search || undefined,
+		}
+	}, [activeCategory, search])
+
+	const { data: visibleProducts = [], isLoading, isError } = useGetProductsQuery(queryArgs)
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">

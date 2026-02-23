@@ -4,15 +4,16 @@
  */
 
 import { useEffect, useMemo, useState } from 'react'
-import Navbar from '../components/Navbar.jsx'
-import Footer from '../components/Footer.jsx'
+import { Link } from 'react-router-dom'
+import Navbar from '../../components/Navbar.jsx'
+import Footer from '../../components/Footer.jsx'
 import {
 	useCreateProductMutation,
 	useDeleteProductMutation,
 	useGetProductsQuery,
 	useSeedProductsMutation,
 	useUpdateProductMutation,
-} from '../services/apiSlice.js'
+} from '../../services/apiSlice.js'
 
 const initialForm = {
 	id: '',
@@ -218,14 +219,22 @@ export default function AdminProducts() {
 							</h1>
 							<p className="mt-2 text-sm text-slate-600">Create, edit, delete, and seed products from backend.</p>
 						</div>
-						<button
-							type="button"
-							onClick={onSeed}
-							disabled={isBusy}
-							className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
-						>
-							{isSeeding ? 'Seeding...' : 'Seed sample data'}
-						</button>
+						<div className="flex flex-wrap items-center gap-2">
+							<Link
+								to="/admin/orders"
+								className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 transition-colors hover:bg-slate-50"
+							>
+								Orders
+							</Link>
+							<button
+								type="button"
+								onClick={onSeed}
+								disabled={isBusy}
+								className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+							>
+								{isSeeding ? 'Seeding...' : 'Seed sample data'}
+							</button>
+						</div>
 					</div>
 
 					<div className="mt-8 grid gap-6 lg:grid-cols-12">
@@ -259,137 +268,152 @@ export default function AdminProducts() {
 										onChange={onChange('price')}
 										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
 									/>
-									<label className="grid gap-2 text-sm text-slate-700">
-										<span className="font-semibold text-slate-900">Product image</span>
+									<div className="grid gap-3 sm:grid-cols-2">
 										<input
-											type="file"
-											accept="image/*"
-											onChange={onImageFileChange}
-											disabled={isBusy || isReadingImage}
-											className="h-11 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
+											type="text"
+											required
+											placeholder="Category"
+											value={form.category}
+											onChange={onChange('category')}
+											className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
 										/>
-									</label>
-									{isReadingImage ? <p className="text-xs text-slate-500">Processing image...</p> : null}
-									{imagePreview ? (
-										<div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-											<div className="aspect-video">
-												<img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
-											</div>
-										</div>
-									) : null}
-									<input
-										type="text"
-										required
-										placeholder="Category"
-										value={form.category}
-										onChange={onChange('category')}
-										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
-									/>
-									<input
-										type="number"
-										required
-										min="0"
-										placeholder="Stocks"
-										value={form.stocks}
-										onChange={onChange('stocks')}
-										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
-									/>
-									<textarea
-										required
-										rows={4}
-										placeholder="Description"
-										value={form.description}
-										onChange={onChange('description')}
-										className="w-full rounded-lg border border-slate-200 p-3 text-sm"
-									/>
-									<label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+										<input
+											type="number"
+											required
+											min="0"
+											placeholder="Stock"
+											value={form.stocks}
+											onChange={onChange('stocks')}
+											className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+										/>
+									</div>
+
+									<label className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
+										<span>Featured product</span>
 										<input
 											type="checkbox"
 											checked={form.isFeatured}
 											onChange={onChange('isFeatured')}
+											className="h-4 w-4 rounded border-slate-300 text-slate-950"
 										/>
-										Featured product
 									</label>
-								</div>
 
-								<div className="mt-4 flex gap-2">
-									<button
-										type="submit"
-										disabled={isBusy}
-										className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
-									>
-										{isUpdating ? 'Updating...' : isCreating ? 'Creating...' : editingId ? 'Update' : 'Create'}
-									</button>
-									{editingId ? (
+									<textarea
+										required
+										placeholder="Description"
+										value={form.description}
+										onChange={onChange('description')}
+										rows={4}
+										className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+									/>
+
+									<div>
+										<label className="text-sm font-semibold text-slate-800">Product image</label>
+										<input
+											type="file"
+											accept="image/*"
+											onChange={onImageFileChange}
+											className="mt-2 block w-full text-xs text-slate-600"
+										/>
+										{isReadingImage ? <p className="mt-2 text-xs text-slate-500">Processing image...</p> : null}
+										{imagePreview ? (
+											<img src={imagePreview} alt="Preview" className="mt-3 h-32 w-full rounded-lg object-cover" />
+										) : null}
+									</div>
+
+									<div className="flex flex-wrap gap-2 pt-2">
+										<button
+											type="submit"
+											disabled={isBusy}
+											className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+										>
+											{editingId ? 'Update product' : 'Create product'}
+										</button>
 										<button
 											type="button"
 											onClick={resetForm}
-											className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+											className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
 										>
-											Cancel edit
+											Reset
 										</button>
-									) : null}
+									</div>
+									{createErrorMessage ? <p className="mt-2 text-xs text-rose-600">{createErrorMessage}</p> : null}
 								</div>
-								{!editingId && createErrorMessage ? (
-									<p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
-										{createErrorMessage}
-									</p>
-								) : null}
 							</form>
 						</section>
 
 						<section className="lg:col-span-7">
 							<div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-								<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-									<p className="text-sm font-semibold text-slate-900">Products ({products.length})</p>
+								<div className="flex items-center justify-between">
+									<div>
+										<p className="text-sm font-semibold text-slate-900">Products ({products.length})</p>
+										<p className="mt-1 text-xs text-slate-600">Manage product catalog entries.</p>
+									</div>
 									<input
-										type="search"
-										placeholder="Search by name or category"
 										value={search}
-										onChange={(e) => setSearch(e.target.value)}
-										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm sm:max-w-sm"
+										onChange={(event) => setSearch(event.target.value)}
+										placeholder="Search products..."
+										className="h-9 rounded-lg border border-slate-200 px-3 text-sm"
 									/>
 								</div>
 
-								{isLoading ? (
-									<p className="mt-6 text-sm text-slate-600">Loading products...</p>
-								) : isError ? (
-									<p className="mt-6 text-sm text-rose-600">Failed to load products from backend.</p>
-								) : sortedProducts.length === 0 ? (
-									<p className="mt-6 text-sm text-slate-600">No products found.</p>
-								) : (
-									<div className="mt-6 space-y-3">
-										{sortedProducts.map((product) => (
-											<div key={product.id} className="rounded-xl border border-slate-200 p-4">
-												<div className="flex items-start justify-between gap-3">
-													<div className="min-w-0">
-														<p className="truncate text-sm font-semibold text-slate-900">{product.name}</p>
-														<p className="mt-1 text-xs text-slate-600">
-															{product.category} • ${product.price} • stock {product.stocks}
-														</p>
+								<div className="mt-6 grid gap-4">
+									{isLoading ? (
+										<div className="grid gap-3">
+											{Array.from({ length: 6 }).map((_, index) => (
+												<div key={index} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
+											))}
+										</div>
+									) : isError ? (
+										<div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+											Could not load products.
+										</div>
+									) : sortedProducts.length === 0 ? (
+										<div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+											No products match your search.
+										</div>
+									) : (
+										sortedProducts.map((product) => (
+											<div key={product.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+												<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+													<div className="flex items-center gap-4">
+														<img
+															src={product.image}
+															alt={product.name}
+															className="h-16 w-16 rounded-xl object-cover"
+														/>
+														<div>
+															<p className="text-sm font-semibold text-slate-900">{product.name}</p>
+															<p className="text-xs text-slate-500">ID: {product.id}</p>
+															<p className="text-xs text-slate-500">Category: {product.category}</p>
+														</div>
 													</div>
-													<div className="flex items-center gap-2">
+													<div className="text-sm text-slate-700">
+														<p>Price: ${product.price}</p>
+														<p>Stock: {product.stocks}</p>
+													</div>
+													<div className="flex flex-wrap gap-2">
 														<button
 															type="button"
 															onClick={() => startEdit(product)}
-															className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+															className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
 														>
 															Edit
 														</button>
 														<button
 															type="button"
 															onClick={() => onDelete(product.id)}
-															disabled={isBusy}
-															className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
+															className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
 														>
 															Delete
 														</button>
 													</div>
 												</div>
 											</div>
-										))}
-									</div>
-								)}
+										))
+									)
+									}
+								</div>
 							</div>
 						</section>
 					</div>

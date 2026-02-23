@@ -12,6 +12,10 @@ function normalizeEnvValue(value = '') {
 const env = {
 	port: Number(process.env.PORT || 5000),
 	nodeEnv: process.env.NODE_ENV || 'development',
+	// Admin allowlist (server-side). We also support Vite-style names as a fallback
+	// because many setups reuse the same `.env` values across frontend/backend.
+	adminUids: normalizeEnvValue(process.env.ADMIN_UIDS || process.env.VITE_ADMIN_UIDS || ''),
+	adminEmails: normalizeEnvValue(process.env.ADMIN_EMAILS || process.env.VITE_ADMIN_EMAILS || ''),
 	cloudinaryCloudName: normalizeEnvValue(process.env.CLOUDINARY_CLOUD_NAME || ''),
 	cloudinaryApiKey: normalizeEnvValue(process.env.CLOUDINARY_API_KEY || ''),
 	cloudinaryApiSecret: normalizeEnvValue(process.env.CLOUDINARY_API_SECRET || ''),

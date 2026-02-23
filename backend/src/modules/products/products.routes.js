@@ -3,6 +3,8 @@
  */
 
 const { Router } = require('express')
+const { authGuard } = require('../../middleware/authGuard')
+const { adminGuard } = require('../../middleware/adminGuard')
 const { asyncHandler } = require('../../utils/asyncHandler')
 const {
 	listProducts,
@@ -16,10 +18,10 @@ const {
 const router = Router()
 
 router.get('/', asyncHandler(listProducts))
-router.post('/', asyncHandler(createProduct))
-router.post('/seed', asyncHandler(seedProducts))
+router.post('/', authGuard, adminGuard, asyncHandler(createProduct))
+router.post('/seed', authGuard, adminGuard, asyncHandler(seedProducts))
 router.get('/:id', asyncHandler(getProductById))
-router.put('/:id', asyncHandler(updateProduct))
-router.delete('/:id', asyncHandler(deleteProduct))
+router.put('/:id', authGuard, adminGuard, asyncHandler(updateProduct))
+router.delete('/:id', authGuard, adminGuard, asyncHandler(deleteProduct))
 
 module.exports = router

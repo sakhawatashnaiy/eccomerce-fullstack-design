@@ -1,70 +1,100 @@
 /*
  * Global styles entry for the app.
- * Includes Tailwind and a small custom utility animation.
+ * Includes Tailwind.
  */
 @import "tailwindcss";
 
+:root {
+	--font-sans: "Space Grotesk", "Sora", "Neue Montreal", "Inter", "Segoe UI", sans-serif;
+	--bg: #f6f7fb;
+	--bg-elevated: #ffffff;
+	--surface: #ffffff;
+	--surface-strong: #f0f2f6;
+	--text: #0f172a;
+	--text-muted: #5b6472;
+	--primary: #1a2cff;
+	--primary-soft: rgba(26, 44, 255, 0.12);
+	--accent: #00c2a8;
+	--glass: rgba(255, 255, 255, 0.55);
+	--glass-border: rgba(148, 163, 184, 0.35);
+	--ring: rgba(15, 23, 42, 0.08);
+	--shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+	--radius: 20px;
+}
+
+.theme-dark {
+	--bg: #0b0f1c;
+	--bg-elevated: #101726;
+	--surface: #121a2b;
+	--surface-strong: #1c2538;
+	--text: #e2e8f0;
+	--text-muted: #94a3b8;
+	--primary: #6ea7ff;
+	--primary-soft: rgba(110, 167, 255, 0.16);
+	--accent: #8bffc8;
+	--glass: rgba(15, 23, 42, 0.72);
+	--glass-border: rgba(148, 163, 184, 0.22);
+	--ring: rgba(148, 163, 184, 0.12);
+	--shadow: 0 24px 60px rgba(8, 12, 20, 0.55);
+}
+
+@layer base {
+	:root,
+	.theme-dark {
+		color-scheme: light;
+	}
+
+	.theme-dark {
+		color-scheme: dark;
+	}
+
+	body {
+		font-family: var(--font-sans);
+		background: var(--bg);
+		color: var(--text);
+		min-height: 100vh;
+		transition: background 0.3s ease, color 0.3s ease;
+	}
+}
+
+@layer components {
+	.glass-panel {
+		background: var(--glass);
+		border: 1px solid var(--glass-border);
+		box-shadow: var(--shadow);
+		backdrop-filter: blur(18px);
+	}
+
+	.surface-card {
+		background: var(--surface);
+		border: 1px solid var(--ring);
+		border-radius: var(--radius);
+	}
+
+	.surface-soft {
+		background: var(--surface-strong);
+		border: 1px solid var(--ring);
+		border-radius: var(--radius);
+	}
+
+	.text-muted {
+		color: var(--text-muted);
+	}
+}
+
 @layer utilities {
-    @keyframes cart-pop {
-        0% {
-            transform: scale(0.98);
-        }
-        60% {
-            transform: scale(1.02);
-        }
-        100% {
-            transform: scale(1);
-        }
-    }
+	.animate-shimmer {
+		background: linear-gradient(110deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12));
+		background-size: 200% 100%;
+		animation: shimmer 1.6s ease-in-out infinite;
+	}
 
-    .animate-cart-pop {
-        animation: cart-pop 220ms ease-out;
-    }
-
-    /* Navbar brand decorative before/after dots */
-    @keyframes nav-dot-orbit {
-        0% {
-            transform: translateX(0) scale(1);
-            opacity: 0.6;
-        }
-        50% {
-            transform: translateX(6px) scale(1.1);
-            opacity: 1;
-        }
-        100% {
-            transform: translateX(0) scale(1);
-            opacity: 0.6;
-        }
-    }
-
-    .navbar-brand-animated {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding-inline-start: 1.25rem;
-    }
-
-    .navbar-brand-animated::before,
-    .navbar-brand-animated::after {
-        content: "";
-        position: absolute;
-        inset-block-start: 50%;
-        transform: translateY(-50%);
-        border-radius: 9999px;
-        width: 0.45rem;
-        height: 0.45rem;
-        background-image: linear-gradient(135deg, #0f172a, #1d4ed8);
-        box-shadow: 0 0 0.35rem rgba(15, 23, 42, 0.5);
-    }
-
-    .navbar-brand-animated::before {
-        inset-inline-start: 0;
-        animation: nav-dot-orbit 1.6s ease-in-out infinite;
-    }
-
-    .navbar-brand-animated::after {
-        inset-inline-start: 0.55rem;
-        opacity: 0.4;
-    }
+	@keyframes shimmer {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
+	}
 }

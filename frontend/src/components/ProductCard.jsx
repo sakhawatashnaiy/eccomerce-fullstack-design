@@ -2,7 +2,9 @@
  * Product list card component.
  * Handles navigation to details, recently-viewed tracking, and add-to-cart.
  */
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { memo } from 'react'
 import { addToCart } from '../utils/cart.js'
 import { addRecentlyViewed } from '../utils/recentlyViewed.js'
 
@@ -18,7 +20,7 @@ function formatMoney(value) {
 	}
 }
 
-function Stars({ rating = 0 }) {
+const Stars = memo(function Stars({ rating = 0 }) {
 	const fullStars = Math.round(rating)
 	return (
 		<div className="flex items-center gap-1" aria-label={`${rating} out of 5 stars`}>
@@ -40,9 +42,10 @@ function Stars({ rating = 0 }) {
 			})}
 		</div>
 	)
-}
+})
 
-export default function ProductCard({ product }) {
+function ProductCard({ product }) {
+	const MotionArticle = motion.article
 	const {
 		id,
 		name,
@@ -58,7 +61,11 @@ export default function ProductCard({ product }) {
 	const hasDiscount = typeof compareAtPrice === 'number' && compareAtPrice > price
 
 	return (
-		<article className="group rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-300">
+		<MotionArticle
+			className="group rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-300"
+			whileHover={{ y: -3 }}
+			transition={{ duration: 0.18, ease: 'easeOut' }}
+		>
 			<div className="relative overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200">
 				<div className="aspect-[4/3] w-full">
 					<Link
@@ -133,7 +140,9 @@ export default function ProductCard({ product }) {
 					</button>
 				</div>
 			</div>
-		</article>
+		</MotionArticle>
 	)
 }
+
+export default memo(ProductCard)
 

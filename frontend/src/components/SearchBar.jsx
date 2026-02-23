@@ -1,8 +1,13 @@
 /**
  * Stateless search input UI.
- * Currently prevents submit; wire it to filtering/search state as needed.
+ * Uses a stable, unique input id by default (prevents duplicate ids when multiple search bars render).
  */
-export default function SearchBar({ placeholder = 'Search', value = '', onChange, onSubmit }) {
+import { memo, useId } from 'react'
+
+function SearchBar({ id, placeholder = 'Search', value = '', onChange, onSubmit }) {
+	const reactId = useId()
+	const inputId = id || `search-${reactId}`
+
 	return (
 		<form
 			onSubmit={(e) => {
@@ -11,7 +16,7 @@ export default function SearchBar({ placeholder = 'Search', value = '', onChange
 			}}
 			className="w-full"
 		>
-			<label className="sr-only" htmlFor="search">
+			<label className="sr-only" htmlFor={inputId}>
 				Search
 			</label>
 			<div className="relative">
@@ -34,15 +39,17 @@ export default function SearchBar({ placeholder = 'Search', value = '', onChange
 					</svg>
 				</span>
 				<input
-					id="search"
+					id={inputId}
 					type="search"
 					placeholder={placeholder}
 					value={value}
 					onChange={(e) => onChange?.(e.target.value)}
-					className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+					className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"
 				/>
 			</div>
 		</form>
 	)
 }
+
+export default memo(SearchBar)
 
