@@ -2,7 +2,7 @@
  * Top navigation bar.
  * Includes search UI and a live-updating cart count via `utils/cart.js`.
  */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import SearchBar from './SearchBar.jsx'
 import { getCartCount } from '../utils/cart.js'
@@ -40,15 +40,18 @@ export default function Navbar() {
 	const [signedIn, setSignedIn] = useState(() => isSignedIn())
 	const [canSeeAdmin, setCanSeeAdmin] = useState(() => (isSignedIn() ? isAdminAllowed() : false))
 
-	const submitSearch = (text) => {
-		const query = String(text || '').trim()
-		if (!query) {
-			navigate('/products')
-		} else {
-			navigate(`/products?search=${encodeURIComponent(query)}`)
-		}
-		setIsOpen(false)
-	}
+	const submitSearch = useCallback(
+		(text) => {
+			const query = String(text || '').trim()
+			if (!query) {
+				navigate('/products')
+			} else {
+				navigate(`/products?search=${encodeURIComponent(query)}`)
+			}
+			setIsOpen(false)
+		},
+		[navigate]
+	)
 
 	useEffect(() => {
 		const refresh = () => setCartCount(getCartCount())

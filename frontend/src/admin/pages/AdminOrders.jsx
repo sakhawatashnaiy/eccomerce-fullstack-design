@@ -4,45 +4,10 @@
  */
 
 import { Link } from 'react-router-dom'
-import {
-	Area,
-	AreaChart,
-	Bar,
-	BarChart,
-	CartesianGrid,
-	Cell,
-	Legend,
-	Pie,
-	PieChart,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from 'recharts'
 
 import Navbar from '../../components/Navbar.jsx'
 import Footer from '../../components/Footer.jsx'
 import { useGetAdminOrdersQuery } from '../../services/apiSlice.js'
-
-const PAYMENT_METHODS = [
-	{ key: 'cod', label: 'Cash on Delivery' },
-	{ key: 'jazzcash', label: 'JazzCash' },
-	{ key: 'easypaisa', label: 'EasyPaisa' },
-	{ key: 'bank', label: 'Bank Transfer' },
-	{ key: 'card', label: 'Bank Card' },
-	{ key: 'paypal', label: 'PayPal (International)' },
-	{ key: 'other', label: 'Other' },
-]
-
-const METHOD_COLORS = [
-	'var(--color-slate-500)',
-	'var(--color-indigo-500)',
-	'var(--color-emerald-500)',
-	'var(--color-amber-500)',
-	'var(--color-rose-500)',
-	'var(--color-sky-500)',
-	'var(--color-zinc-500)',
-]
 
 function formatMoney(value) {
 	const n = Number(value) || 0
