@@ -40,23 +40,12 @@ function Footer() {
 		<footer className="border-t border-slate-200 bg-white">
 			<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
 				<div className="grid gap-10 lg:grid-cols-12">
-					<div className="lg:col-span-4">
-						<div className="flex items-center gap-2">
-							 
-							<span className="text-base font-semibold tracking-tight text-slate-950">My store</span>
-						</div>
-						<p className="mt-4 max-w-sm text-base leading-7 text-slate-600">
-						Welcome to My Store, your everyday destination for quality tech and lifestyle essentials. We curate reliable products, clear specs, and honest prices so you can shop with confidence. From phones and accessories to home upgrades, each item is selected for performance, design, and value. Enjoy a smooth browsing experience, secure checkout, and responsive support whenever you need help. Orders ship fast, returns are simple, and new arrivals land regularly. Whether you’re upgrading your setup or finding a practical gift, we make it easy to choose well. Join our community for tips, deals, and inspiration, and enjoy shopping that feels effortless.
-					</p>
-						<p className="mt-6 text-xs text-slate-500">© {new Date().getFullYear()} My store. All rights reserved.</p>
-					</div>
-
-					<div className="lg:col-span-8">
-						<div className="grid gap-8 sm:grid-cols-3">
+					<div className="lg:col-span-12">
+						<div className="mx-auto grid max-w-4xl justify-items-center gap-8 sm:grid-cols-3">
 							{links.map((group) => (
-								<div key={group.title}>
+								<div key={group.title} className="text-center">
 									<p className="text-base font-semibold text-slate-900">{group.title}</p>
-									<ul className="mt-3 space-y-2">
+									<ul className="mt-3 flex flex-col items-center space-y-2">
 										{group.items.map((item) => (
 											<li key={item.label}>
 												<Link to={item.to} className="text-base text-slate-600 hover:text-slate-900">
@@ -70,8 +59,8 @@ function Footer() {
 						</div>
 
 						<div className="mt-10 rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-								<div>
+							<div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-center">
+								<div className="sm:text-left">
 									<p className="text-base font-semibold text-slate-900">Stay in the loop</p>
 									<p className="mt-1 text-base text-slate-600">Product updates, launches, and offers.</p>
 								</div>
@@ -96,6 +85,9 @@ function Footer() {
 								</form>
 							</div>
 						</div>
+						<p className="mt-10 text-center text-xs text-slate-500">
+							© {new Date().getFullYear()} My store. All rights reserved.
+						</p>
 					</div>
 				</div>
 			</div>

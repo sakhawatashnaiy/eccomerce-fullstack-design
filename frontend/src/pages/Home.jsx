@@ -15,23 +15,12 @@ function parseDate(value) {
 	return Number.isNaN(d.getTime()) ? null : d
 }
 
-function formatTimeLeft(ms) {
-	if (ms <= 0) return '00:00:00'
-	const totalSeconds = Math.floor(ms / 1000)
-	const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0')
-	const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0')
-	const seconds = String(totalSeconds % 60).padStart(2, '0')
-	return `${hours}:${minutes}:${seconds}`
-}
-
 const HeroSlider = memo(function HeroSlider({ slides }) {
 	const safeSlides = Array.isArray(slides) && slides.length ? slides : promoSlides
 	const [slideIndex, setSlideIndex] = useState(0)
-
-	useEffect(() => {
-		if (!safeSlides.length) return
-		setSlideIndex((i) => i % safeSlides.length)
-	}, [safeSlides.length])
+	const normalizedIndex = safeSlides.length
+		? ((slideIndex % safeSlides.length) + safeSlides.length) % safeSlides.length
+		: 0
 
 	useEffect(() => {
 		if (!safeSlides.length) return
@@ -41,7 +30,7 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 		return () => window.clearInterval(id)
 	}, [safeSlides.length])
 
-	const slide = safeSlides[slideIndex] || safeSlides[0]
+	const slide = safeSlides[normalizedIndex] || safeSlides[0]
 
 	return (
 		<section className="relative overflow-hidden bg-slate-950">
@@ -104,7 +93,7 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 								type="button"
 								onClick={() => setSlideIndex(i)}
 								className={
-									i === slideIndex
+									i === normalizedIndex
 										? 'h-2.5 w-8 rounded-full bg-white/80'
 										: 'h-2.5 w-2.5 rounded-full bg-white/25 hover:bg-white/40'
 								}
@@ -139,25 +128,6 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 		</section>
 	)
 })
-
-const DiscountCountdown = memo(function DiscountCountdown({ discountEndMs }) {
-	const [timeLeft, setTimeLeft] = useState(() => formatTimeLeft((Number(discountEndMs) || 0) - Date.now()))
-
-	useEffect(() => {
-		const id = window.setInterval(() => {
-			setTimeLeft(formatTimeLeft((Number(discountEndMs) || 0) - Date.now()))
-		}, 1000)
-		return () => window.clearInterval(id)
-	}, [discountEndMs])
-
-	return (
-		<p className="mt-1 font-mono text-lg font-semibold text-slate-900">{timeLeft}</p>
-	)
-})
-
-function getDiscounted(allProducts) {
-	return allProducts.filter((p) => typeof p.compareAtPrice === 'number' && p.compareAtPrice > p.price)
-}
 
 function getLatest(allProducts) {
 	return [...allProducts]
@@ -200,14 +170,6 @@ const promoSlides = [
 		cta2: { label: 'View all products', to: '/products' },
 		image: null,
 	},
-	{
-		tag: 'Save more',
-		heading: 'Discounts that create urgency',
-		subtitle: 'Grab selected deals before the countdown ends — limited stock.',
-		cta1: { label: 'View discounts', to: '#discounts' },
-		cta2: { label: 'Go to products', to: '/products' },
-		image: null,
-	},
 ]
 
 export default function Home() {
@@ -216,7 +178,6 @@ export default function Home() {
 
 	const featured = useMemo(() => getFeatured(allProducts).slice(0, 8), [allProducts])
 	const latest = useMemo(() => getLatest(allProducts).slice(0, 8), [allProducts])
-	const discounted = useMemo(() => getDiscounted(allProducts).slice(0, 8), [allProducts])
 	const categories = useMemo(() => buildCategoryCards(allProducts), [allProducts])
 
 	const recentlyViewed = useMemo(() => {
@@ -227,8 +188,6 @@ export default function Home() {
 	const slides = useMemo(() => {
 		return promoSlides.map((slide, index) => ({ ...slide, image: allProducts[index]?.image || null }))
 	}, [allProducts])
-
-	const discountEnd = useMemo(() => new Date('2026-03-01T00:00:00.000Z').getTime(), [])
 
 	useEffect(() => {
 		const refresh = () => setRecentIds(getRecentlyViewedIds())
@@ -346,83 +305,6 @@ export default function Home() {
 								))}
 							</div>
 						)}
-					</div>
-				</section>
-
-				{/* Discounts (urgency) */}
-				<section id="discounts" className="bg-slate-50">
-					<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-							<div>
-								<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Discounts</h2>
-								<p className="mt-2 text-sm text-slate-600">Urgency section with countdown + discount badges.</p>
-							</div>
-							<div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
-								<p className="text-xs font-semibold text-slate-600">Offer ends in</p>
-								<DiscountCountdown discountEndMs={discountEnd} />
-							</div>
-						</div>
-
-						{isLoading ? (
-							<p className="mt-8 text-sm text-slate-600">Loading discounts...</p>
-						) : (
-							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-								{discounted.map((product) => (
-									<ProductCard key={product.id} product={product} />
-								))}
-							</div>
-						)}
-					</div>
-				</section>
-
-				{/* Brands / partners */}
-				<section className="bg-white">
-					<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-						<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Brands & partners</h2>
-						<p className="mt-2 text-sm text-slate-600">Trusted names that help customers buy with confidence.</p>
-
-						<div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-							{['Nova', 'Aurex', 'Pulse', 'ByteBook', 'Glow', 'CoreWear'].map((name) => (
-								<div
-									key={name}
-									className="flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-700"
-								>
-									{name}
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
-
-				{/* Testimonials */}
-				<section className="bg-slate-50">
-					<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-						<div>
-							<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Testimonials</h2>
-							<p className="mt-2 text-sm text-slate-600">Social proof that supports conversion.</p>
-						</div>
-
-						<div className="mt-8 grid gap-4 lg:grid-cols-3">
-							{[
-								{
-									name: 'Ayesha',
-									text: 'Fast delivery and the product quality was exactly as described. Checkout felt safe and smooth.',
-								},
-								{
-									name: 'Rohan',
-									text: 'Love the clean UI. I found what I needed quickly and the deals section made it easy to decide.',
-								},
-								{
-									name: 'Sara',
-									text: 'Great support and simple returns. This store feels professional and trustworthy.',
-								},
-							].map((t) => (
-								<div key={t.name} className="rounded-2xl border border-slate-200 bg-white p-6">
-									<p className="text-sm text-slate-700">“{t.text}”</p>
-									<p className="mt-4 text-sm font-semibold text-slate-900">{t.name}</p>
-								</div>
-							))}
-						</div>
 					</div>
 				</section>
 

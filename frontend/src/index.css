@@ -22,7 +22,7 @@
 	--radius: 20px;
 }
 
-.theme-dark {
+:root.theme-dark {
 	--bg: #0b0f1c;
 	--bg-elevated: #101726;
 	--surface: #121a2b;
@@ -40,11 +40,11 @@
 
 @layer base {
 	:root,
-	.theme-dark {
+	:root.theme-dark {
 		color-scheme: light;
 	}
 
-	.theme-dark {
+	:root.theme-dark {
 		color-scheme: dark;
 	}
 
@@ -67,12 +67,6 @@
 
 	.surface-card {
 		background: var(--surface);
-		border: 1px solid var(--ring);
-		border-radius: var(--radius);
-	}
-
-	.surface-soft {
-		background: var(--surface-strong);
 		border: 1px solid var(--ring);
 		border-radius: var(--radius);
 	}

@@ -4,10 +4,11 @@
  */
 
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 import Navbar from '../../components/Navbar.jsx'
 import Footer from '../../components/Footer.jsx'
-import { useGetAdminOrdersQuery } from '../../services/apiSlice.js'
+import { apiSlice, useGetAdminOrdersQuery } from '../../services/apiSlice.js'
 
 function formatMoney(value) {
 	const n = Number(value) || 0
@@ -76,13 +77,24 @@ function getPaymentTone(status) {
 }
 
 export default function AdminOrders() {
+	const dispatch = useDispatch()
 	const {
 		data: orders = [],
 		isLoading,
+		isFetching,
 		isError,
 		error,
 		refetch,
 	} = useGetAdminOrdersQuery()
+
+	const onRefresh = async () => {
+		dispatch(apiSlice.util.invalidateTags([{ type: 'Orders', id: 'LIST' }]))
+		try {
+			await refetch()
+		} catch {
+			// invalidation above still triggers a refetch for active subscribers
+		}
+	}
 
 	const errorMessage =
 		error?.data?.message || error?.data?.error || error?.error || 'Could not load orders. Please try again.'
@@ -109,10 +121,11 @@ export default function AdminOrders() {
 							</Link>
 							<button
 								type="button"
-								onClick={() => refetch()}
-								className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900"
+								onClick={onRefresh}
+								disabled={isFetching}
+								className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-70"
 							>
-								Refresh
+								{isFetching ? 'Refreshing…' : 'Refresh'}
 							</button>
 						</div>
 					</div>
@@ -131,7 +144,7 @@ export default function AdminOrders() {
 								<div className="mt-4">
 									<button
 										type="button"
-										onClick={() => refetch()}
+										onClick={onRefresh}
 										className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-800"
 									>
 										Try again

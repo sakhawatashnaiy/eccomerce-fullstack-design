@@ -78,14 +78,14 @@ export default function Navbar() {
 	return (
 		<header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70">
 			<div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-				<a href="#" className="inline-flex items-center gap-2">
+				<Link to="/" className="inline-flex items-center gap-2">
 					{/* <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-sm font-semibold text-white">
 						ES
 					</span> */}
 					<span className="navbar-brand-animated font-sans text-lg font-bold italic tracking-tight text-slate-950 transition-transform duration-300 hover:-translate-y-0.5 sm:text-xl">
 						My Eccomerce store
 					</span>
-				</a>
+				</Link>
 
 				<div className="hidden flex-1 items-center gap-3 md:flex">
 					<nav className="flex items-center gap-6 text-sm font-medium text-slate-700">

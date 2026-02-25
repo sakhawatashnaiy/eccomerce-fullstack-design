@@ -194,7 +194,7 @@ export default function AdminProducts() {
 					{feedback ? (
 						<div
 							className={
-								'mb-4 flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm ring-1 ' +
+								'mb-5 flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-base ring-1 ' +
 								(feedback.type === 'success'
 									? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
 									: 'bg-rose-50 text-rose-700 ring-rose-200')
@@ -204,7 +204,7 @@ export default function AdminProducts() {
 							<button
 								type="button"
 								onClick={() => setFeedback(null)}
-								className="rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-current/25 hover:bg-white/40"
+								className="rounded-lg px-3 py-1.5 text-sm font-semibold ring-1 ring-current/25 hover:bg-white/40"
 							>
 								Dismiss
 							</button>
@@ -213,16 +213,18 @@ export default function AdminProducts() {
 
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 						<div>
-							<p className="text-xs font-semibold text-slate-600">Admin panel</p>
+							<p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Admin panel</p>
 							<h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
 								Product management
 							</h1>
-							<p className="mt-2 text-sm text-slate-600">Create, edit, delete, and seed products from backend.</p>
+							<p className="mt-2 text-base text-slate-600">
+								Create, edit, delete, and seed products from backend.
+							</p>
 						</div>
 						<div className="flex flex-wrap items-center gap-2">
 							<Link
 								to="/admin/orders"
-								className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 transition-colors hover:bg-slate-50"
+								className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2.5 text-base font-semibold text-slate-900 ring-1 ring-slate-200 transition-colors hover:bg-slate-50"
 							>
 								Orders
 							</Link>
@@ -230,7 +232,7 @@ export default function AdminProducts() {
 								type="button"
 								onClick={onSeed}
 								disabled={isBusy}
-								className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+								className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-base font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
 							>
 								{isSeeding ? 'Seeding...' : 'Seed sample data'}
 							</button>
@@ -239,8 +241,8 @@ export default function AdminProducts() {
 
 					<div className="mt-8 grid gap-6 lg:grid-cols-12">
 						<section className="lg:col-span-5">
-							<form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-								<p className="text-sm font-semibold text-slate-900">{editingId ? 'Update product' : 'Create product'}</p>
+							<form onSubmit={onSubmit} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+								<p className="text-base font-semibold text-slate-900">{editingId ? 'Update product' : 'Create product'}</p>
 								<div className="mt-4 grid gap-3">
 									{!editingId ? (
 										<input
@@ -248,7 +250,7 @@ export default function AdminProducts() {
 											placeholder="ID (optional, e.g. p_100)"
 											value={form.id}
 											onChange={onChange('id')}
-											className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 										/>
 									) : null}
 									<input
@@ -257,7 +259,7 @@ export default function AdminProducts() {
 										placeholder="Product name"
 										value={form.name}
 										onChange={onChange('name')}
-										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+										className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 									/>
 									<input
 										type="number"
@@ -266,7 +268,7 @@ export default function AdminProducts() {
 										placeholder="Price"
 										value={form.price}
 										onChange={onChange('price')}
-										className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+										className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 									/>
 									<div className="grid gap-3 sm:grid-cols-2">
 										<input
@@ -275,7 +277,7 @@ export default function AdminProducts() {
 											placeholder="Category"
 											value={form.category}
 											onChange={onChange('category')}
-											className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 										/>
 										<input
 											type="number"
@@ -284,12 +286,12 @@ export default function AdminProducts() {
 											placeholder="Stock"
 											value={form.stocks}
 											onChange={onChange('stocks')}
-											className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 										/>
 									</div>
 
-									<label className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
-										<span>Featured product</span>
+									<label className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700">
+										<span className="font-semibold text-slate-900">Featured product</span>
 										<input
 											type="checkbox"
 											checked={form.isFeatured}
@@ -304,18 +306,18 @@ export default function AdminProducts() {
 										value={form.description}
 										onChange={onChange('description')}
 										rows={4}
-										className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+										className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 									/>
 
 									<div>
-										<label className="text-sm font-semibold text-slate-800">Product image</label>
+										<label className="text-base font-semibold text-slate-900">Product image</label>
 										<input
 											type="file"
 											accept="image/*"
 											onChange={onImageFileChange}
-											className="mt-2 block w-full text-xs text-slate-600"
+											className="mt-2 block w-full text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-900"
 										/>
-										{isReadingImage ? <p className="mt-2 text-xs text-slate-500">Processing image...</p> : null}
+										{isReadingImage ? <p className="mt-2 text-sm text-slate-500">Processing image…</p> : null}
 										{imagePreview ? (
 											<img src={imagePreview} alt="Preview" className="mt-3 h-32 w-full rounded-lg object-cover" />
 										) : null}
@@ -325,35 +327,35 @@ export default function AdminProducts() {
 										<button
 											type="submit"
 											disabled={isBusy}
-											className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+											className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-base font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
 										>
 											{editingId ? 'Update product' : 'Create product'}
 										</button>
 										<button
 											type="button"
 											onClick={resetForm}
-											className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+											className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50"
 										>
 											Reset
 										</button>
 									</div>
-									{createErrorMessage ? <p className="mt-2 text-xs text-rose-600">{createErrorMessage}</p> : null}
+									{createErrorMessage ? <p className="mt-2 text-sm font-semibold text-rose-600">{createErrorMessage}</p> : null}
 								</div>
 							</form>
 						</section>
 
 						<section className="lg:col-span-7">
-							<div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+							<div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-sm font-semibold text-slate-900">Products ({products.length})</p>
-										<p className="mt-1 text-xs text-slate-600">Manage product catalog entries.</p>
+										<p className="text-base font-semibold text-slate-900">Products ({products.length})</p>
+										<p className="mt-1 text-sm text-slate-600">Manage product catalog entries.</p>
 									</div>
 									<input
 										value={search}
 										onChange={(event) => setSearch(event.target.value)}
 										placeholder="Search products..."
-										className="h-9 rounded-lg border border-slate-200 px-3 text-sm"
+										className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 									/>
 								</div>
 
@@ -374,36 +376,40 @@ export default function AdminProducts() {
 										</div>
 									) : (
 										sortedProducts.map((product) => (
-											<div key={product.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+											<div key={product.id} className="rounded-3xl border border-slate-200 bg-white p-5">
 												<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 													<div className="flex items-center gap-4">
 														<img
 															src={product.image}
 															alt={product.name}
-															className="h-16 w-16 rounded-xl object-cover"
+															className="h-16 w-16 rounded-2xl object-cover ring-1 ring-slate-200"
 														/>
 														<div>
-															<p className="text-sm font-semibold text-slate-900">{product.name}</p>
-															<p className="text-xs text-slate-500">ID: {product.id}</p>
-															<p className="text-xs text-slate-500">Category: {product.category}</p>
+															<p className="text-base font-semibold text-slate-900">{product.name}</p>
+															<p className="text-sm text-slate-500">ID: {product.id}</p>
+															<p className="text-sm text-slate-500">Category: {product.category}</p>
 														</div>
 													</div>
-													<div className="text-sm text-slate-700">
-														<p>Price: ${product.price}</p>
-														<p>Stock: {product.stocks}</p>
+													<div className="text-base text-slate-700">
+														<p>
+															<span className="font-semibold text-slate-900">Price:</span> ${product.price}
+														</p>
+														<p>
+															<span className="font-semibold text-slate-900">Stock:</span> {product.stocks}
+														</p>
 													</div>
 													<div className="flex flex-wrap gap-2">
 														<button
 															type="button"
 															onClick={() => startEdit(product)}
-															className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+															className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
 														>
 															Edit
 														</button>
 														<button
 															type="button"
 															onClick={() => onDelete(product.id)}
-															className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+															className="rounded-xl border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
 														>
 															Delete
 														</button>

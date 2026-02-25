@@ -13,6 +13,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import { clearCart, getCartItems } from '../utils/cart.js'
+import { isSignedIn } from '../utils/authSession.js'
+import { useCreateMyOrderMutation } from '../services/apiSlice.js'
 
 function formatMoney(value) {
 	try {
@@ -34,6 +36,8 @@ export default function Checkout() {
 	const [items, setItems] = useState(() => getCartItems())
 	const [isPlacingOrder, setIsPlacingOrder] = useState(false)
 	const [orderPlaced, setOrderPlaced] = useState(false)
+	const [submitError, setSubmitError] = useState('')
+	const [createMyOrder] = useCreateMyOrderMutation()
 
 	// 2) Minimal form state (UI-only).
 	//    This is intentionally lightweight: no backend calls and no payment processing.
@@ -80,17 +84,48 @@ export default function Checkout() {
 	const placeOrder = async (e) => {
 		e.preventDefault()
 		if (isEmpty) return
+		if (!isSignedIn()) {
+			setSubmitError('Please sign in to place an order.')
+			return
+		}
 
 		// 4) Demo checkout behavior:
 		//    - Pretend to "place" the order.
 		//    - Clear cart so the user sees the effect.
 		//    - Show a success state and optionally send them home.
 		setIsPlacingOrder(true)
+		setSubmitError('')
 		try {
-			await new Promise((r) => window.setTimeout(r, 650))
+			await createMyOrder({
+				items,
+				subtotal,
+				shipping,
+				tax,
+				total,
+				customer: {
+					name: form.fullName,
+					email: form.email,
+					phone: '',
+				},
+				shippingAddress: {
+					line1: form.address,
+					line2: '',
+					city: form.city,
+					state: form.state,
+					postalCode: form.zip,
+					country: '',
+				},
+				payment: {
+					method: 'cod',
+					status: 'unpaid',
+				},
+			}).unwrap()
 			clearCart()
 			setOrderPlaced(true)
 			window.setTimeout(() => navigate('/'), 1100)
+		} catch (err) {
+			const message = err?.data?.message || err?.error || 'Could not place order. Please try again.'
+			setSubmitError(String(message))
 		} finally {
 			setIsPlacingOrder(false)
 		}
@@ -108,9 +143,9 @@ export default function Checkout() {
 							<h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
 								Complete your order
 							</h1>
-							<p className="mt-2 text-sm text-slate-600">
+							{/* <p className="mt-2 text-sm text-slate-600">
 								This is a demo checkout — no real payment is processed.
-							</p>
+							</p> */}
 						</div>
 
 						<div className="flex flex-wrap items-center gap-2">
@@ -284,6 +319,9 @@ export default function Checkout() {
 											{orderPlaced ? 'Order placed' : isPlacingOrder ? 'Placing order…' : 'Place order'}
 										</button>
 									</div>
+									{submitError ? (
+										<p className="mt-3 text-xs font-semibold text-rose-600">{submitError}</p>
+									) : null}
 								</div>
 							</form>
 						</section>

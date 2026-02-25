@@ -44,11 +44,21 @@ export default function AppRoutes() {
 				<Route path="/products" element={wrap(withSuspense(<ProductListing />))} />
 				<Route path="/product/:id" element={wrap(withSuspense(<ProductDetails />))} />
 				<Route path="/cart" element={wrap(withSuspense(<Cart />))} />
-				<Route path="/checkout" element={wrap(withSuspense(<Checkout />))} />
+				<Route
+					path="/checkout"
+					element={
+						<ProtectedRoute>{wrap(withSuspense(<Checkout />))}</ProtectedRoute>
+					}
+				/>
 				<Route path="/signup" element={wrap(withSuspense(<Signup />))} />
 				<Route path="/login" element={wrap(withSuspense(<Login />))} />
 				<Route path="/logout" element={wrap(withSuspense(<Logout />))} />
-				<Route path="/orders" element={wrap(withSuspense(<Orders />))} />
+				<Route
+					path="/orders"
+					element={
+						<ProtectedRoute>{wrap(withSuspense(<Orders />))}</ProtectedRoute>
+					}
+				/>
 				<Route path="/careers" element={wrap(withSuspense(<Careers />))} />
 				<Route path="/about" element={wrap(withSuspense(<About />))} />
 				<Route path="/sustainability" element={wrap(withSuspense(<Sustainability />))} />

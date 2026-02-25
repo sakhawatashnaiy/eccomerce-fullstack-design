@@ -234,58 +234,52 @@ export default function GiftCards() {
 								<div className="mt-8">
 									<p className="text-xs font-semibold text-slate-600">Preview</p>
 									<div className="mt-3 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-300 via-white to-slate-200 p-[1px]">
-										<div className="relative rounded-2xl bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 p-6 sm:p-7">
-											<div className="pointer-events-none absolute inset-0">
-												<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-white/60 blur-2xl" />
-												<div className="absolute -right-14 bottom-6 h-44 w-44 rounded-full bg-white/40 blur-2xl" />
-												<div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 opacity-80" />
-												<div className="absolute left-6 top-0 h-full w-[1px] bg-white/60" />
+										<div className="relative overflow-hidden rounded-2xl bg-slate-950 p-4 text-white sm:p-5">
+											<div className="pointer-events-none absolute inset-0 opacity-80">
+												<div className="absolute -top-24 left-1/3 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+												<div className="absolute -bottom-28 right-1/4 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
 											</div>
 
-											<div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+											<div className="relative flex items-start justify-between gap-4">
 												<div>
-													<p className="text-xs font-semibold tracking-wide text-slate-600">DIGITAL GIFT CARD</p>
-													<p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">A little something for you</p>
-													<p className="mt-2 max-w-md text-sm text-slate-600">Redeem at checkout on any item.</p>
+													<p className="text-xs font-semibold tracking-wide text-white/70">ASHNAIY STORE</p>
+													<p className="mt-1 text-sm font-semibold text-white/80">Digital Gift Card</p>
 												</div>
-
-												<div className="shrink-0 rounded-xl bg-white/70 px-4 py-3 ring-1 ring-white/60">
-													<p className="text-xs font-semibold text-slate-600">Value</p>
-													<p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-														{Number.isFinite(selectedAmount) ? formatMoney(selectedAmount) : '$—'}
-													</p>
+												<div className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 ring-1 ring-white/15">
+													Instant email delivery
 												</div>
 											</div>
 
-											<div className="relative mt-6 overflow-hidden rounded-xl bg-white/60 p-4 ring-1 ring-white/60">
-												<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-													<div className="text-sm text-slate-700">
-														<span className="font-semibold text-slate-900">To:</span>{' '}
+											<div className="relative mt-5">
+												<p className="text-sm font-semibold text-white/70">Card value</p>
+												<p className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+													{Number.isFinite(selectedAmount) ? formatMoney(selectedAmount) : '$—'}
+												</p>
+												<p className="mt-2 max-w-xl text-sm leading-6 text-white/75">
+													Redeem on any product at checkout. No complicated rules—just pick what you love.
+												</p>
+											</div>
+
+											<div className="relative mt-4 rounded-xl bg-white/5 p-3 ring-1 ring-white/10">
+												<div className="grid gap-3 sm:grid-cols-2">
+													<div className="text-sm text-white/80">
+														<span className="font-semibold text-white">To:</span>{' '}
 														{String(toEmail || '').trim() || 'recipient@email.com'}
 													</div>
-													<div className="text-sm text-slate-700">
-														<span className="font-semibold text-slate-900">From:</span>{' '}
+													<div className="text-sm text-white/80">
+														<span className="font-semibold text-white">From:</span>{' '}
 														{String(fromName || '').trim() || 'Your name'}
 													</div>
 												</div>
-												<div className="mt-3 border-t border-white/70 pt-3 text-sm text-slate-700">
-													<span className="font-semibold text-slate-900">Message:</span>{' '}
+												<div className="mt-2 border-t border-white/10 pt-2 text-sm text-white/80">
+													<span className="font-semibold text-white">Message:</span>{' '}
 													{String(message || '').trim() || 'A short note makes it extra special.'}
 												</div>
 											</div>
 
-											<div className="relative mt-5 flex items-center justify-between text-xs font-semibold text-slate-600">
+											<div className="relative mt-4 flex items-center justify-between text-xs font-semibold text-white/60">
+												<span>Redeem online</span>
 												<span>Gifted with care</span>
-												<span className="inline-flex items-center gap-2">
-													<svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
-														<path d="M4 12h16v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-														<path d="M12 12v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-														<path d="M4 12V9a2 2 0 012-2h12a2 2 0 012 2v3" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-														<path d="M12 7c-2.5 0-4-1.2-4-3a2 2 0 014 0c0 1.8 0 3 0 3z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-														<path d="M12 7c2.5 0 4-1.2 4-3a2 2 0 00-4 0c0 1.8 0 3 0 3z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-													</svg>
-													<span>Redeem online</span>
-												</span>
 											</div>
 										</div>
 									</div>
