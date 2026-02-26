@@ -335,12 +335,23 @@ export default function Navbar() {
 								</svg>
 								Orders
 							</Link>
-							<button
-								type="button"
-								className="mt-2 rounded-lg bg-slate-950 px-3 py-2 text-left text-sm font-semibold text-white"
-							>
-								Sign in
-							</button>
+							{signedIn ? (
+								<Link
+									to="/logout"
+									className="mt-2 rounded-lg bg-slate-950 px-3 py-2 text-left text-sm font-semibold text-white"
+									onClick={() => setIsOpen(false)}
+								>
+									Sign out
+								</Link>
+							) : (
+								<Link
+									to="/login"
+									className="mt-2 rounded-lg bg-slate-950 px-3 py-2 text-left text-sm font-semibold text-white"
+									onClick={() => setIsOpen(false)}
+								>
+									Sign in
+								</Link>
+							)}
 						</nav>
 					</div>
 				</div>
