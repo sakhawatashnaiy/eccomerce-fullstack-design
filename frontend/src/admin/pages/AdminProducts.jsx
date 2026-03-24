@@ -26,10 +26,62 @@ const initialForm = {
 	isFeatured: false,
 }
 
-function fileToDataUrl(file) {
+function fileToDataUrl(file, { maxDimension = 1400, quality = 0.82 } = {}) {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader()
-		reader.onload = () => resolve(String(reader.result || ''))
+		reader.onload = async () => {
+			try {
+				const originalDataUrl = String(reader.result || '')
+
+				// Small files are already fast enough; keep them as-is.
+				if (!file || file.size <= 300 * 1024) {
+					resolve(originalDataUrl)
+					return
+				}
+
+				// Resize + compress to reduce payload size (faster API + faster Cloudinary upload).
+				const img = new Image()
+				img.onload = () => {
+					try {
+						const width = img.naturalWidth || img.width
+						const height = img.naturalHeight || img.height
+						const scale = Math.min(1, maxDimension / Math.max(width, height))
+						const targetWidth = Math.max(1, Math.round(width * scale))
+						const targetHeight = Math.max(1, Math.round(height * scale))
+
+						const canvas = document.createElement('canvas')
+						canvas.width = targetWidth
+						canvas.height = targetHeight
+
+						const ctx = canvas.getContext('2d')
+						if (!ctx) {
+							resolve(originalDataUrl)
+							return
+						}
+
+						ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+
+						let optimized = ''
+
+						// Prefer WebP when supported (smaller). Fallback keeps transparency for PNGs.
+						optimized = canvas.toDataURL('image/webp', quality)
+						if (!optimized.startsWith('data:image/webp')) {
+							const fallbackMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+							optimized = canvas.toDataURL(fallbackMime, quality)
+						}
+
+						resolve(optimized || originalDataUrl)
+					} catch {
+						resolve(originalDataUrl)
+					}
+				}
+
+				img.onerror = () => resolve(originalDataUrl)
+				img.src = originalDataUrl
+			} catch {
+				reject(new Error('Could not read image file'))
+			}
+		}
 		reader.onerror = () => reject(new Error('Could not read image file'))
 		reader.readAsDataURL(file)
 	})

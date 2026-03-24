@@ -80,7 +80,10 @@ function isPathActive(pathname, matchPrefix) {
 	return String(pathname || '').startsWith(String(matchPrefix))
 }
 
-function SidebarLink({ to, label, icon: Icon, collapsed, onNavigate, kind = 'primary' }) {
+function SidebarLink({ to, label, icon, collapsed, onNavigate, kind = 'primary' }) {
+	const Icon = icon
+	const hasIcon = Boolean(Icon)
+
 	return (
 		<NavLink
 			to={to}
@@ -99,16 +102,21 @@ function SidebarLink({ to, label, icon: Icon, collapsed, onNavigate, kind = 'pri
 				)
 			}
 		>
-			<Icon
-				className={cx('h-5 w-5', kind === 'danger' ? 'text-rose-600' : 'text-[color:currentColor]')}
-				aria-hidden="true"
-			/>
+			{hasIcon ? (
+				<Icon
+					className={cx('h-5 w-5', kind === 'danger' ? 'text-rose-600' : 'text-[color:currentColor]')}
+					aria-hidden="true"
+				/>
+			) : null}
 			{collapsed ? null : <span className="truncate">{label}</span>}
 		</NavLink>
 	)
 }
 
-function SidebarGroup({ label, icon: Icon, items, collapsed, isOpen, isActive, onToggle, onNavigate }) {
+function SidebarGroup({ label, icon, items, collapsed, isOpen, isActive, onToggle, onNavigate }) {
+	const Icon = icon
+	const hasIcon = Boolean(Icon)
+
 	return (
 		<div className="space-y-1">
 			<button
@@ -123,7 +131,7 @@ function SidebarGroup({ label, icon: Icon, items, collapsed, isOpen, isActive, o
 				aria-expanded={Boolean(isOpen)}
 			>
 				<span className="flex min-w-0 items-center gap-3">
-					<Icon className="h-5 w-5" aria-hidden="true" />
+					{hasIcon ? <Icon className="h-5 w-5" aria-hidden="true" /> : null}
 					{collapsed ? null : <span className="truncate">{label}</span>}
 				</span>
 				{collapsed ? null : (
@@ -258,16 +266,20 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 	}, [])
 
 	useEffect(() => {
-		setMobileOpen(false)
+		const id = window.setTimeout(() => setMobileOpen(false), 0)
+		return () => window.clearTimeout(id)
 	}, [location.pathname])
 
 	useEffect(() => {
 		// Keep the group containing the active route open.
-		setOpenGroups((prev) => ({
-			...prev,
-			products: prev.products || isPathActive(location.pathname, '/admin/products'),
-			orders: prev.orders || isPathActive(location.pathname, '/admin/orders'),
-		}))
+		const id = window.setTimeout(() => {
+			setOpenGroups((prev) => ({
+				...prev,
+				products: prev.products || isPathActive(location.pathname, '/admin/products'),
+				orders: prev.orders || isPathActive(location.pathname, '/admin/orders'),
+			}))
+		}, 0)
+		return () => window.clearTimeout(id)
 	}, [location.pathname])
 
 	const breadcrumbTrail = useMemo(() => {

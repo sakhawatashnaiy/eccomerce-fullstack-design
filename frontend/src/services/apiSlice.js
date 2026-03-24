@@ -6,8 +6,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getAuthToken } from '../utils/authSession.js'
 
-//  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://eccomerce-fullstack-design.onrender.com//api/v1'
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://eccomerce-fullstack-design.onrender.com//api/v1/products'
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://eccomerce-fullstack-design.onrender.com/api/v1').replace(
+	/\/+$/,
+	''
+)
 export const apiSlice = createApi({
 	reducerPath: 'api',
 	baseQuery: fetchBaseQuery({
