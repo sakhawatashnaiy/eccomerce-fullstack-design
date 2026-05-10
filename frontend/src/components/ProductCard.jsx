@@ -1,11 +1,10 @@
 /**
  * Product list card component.
- * Handles navigation to details, recently-viewed tracking, and add-to-cart.
+ * Handles navigation to details and recently-viewed tracking.
  */
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { memo } from 'react'
-import { addToCart } from '../utils/cart.js'
 import { addRecentlyViewed } from '../utils/recentlyViewed.js'
 
 function formatMoney(value) {
@@ -30,7 +29,11 @@ const Stars = memo(function Stars({ rating = 0 }) {
 					<svg
 						key={i}
 						viewBox="0 0 20 20"
-						className={isFilled ? 'h-4 w-4 text-amber-500' : 'h-4 w-4 text-slate-300'}
+						className={
+							isFilled
+								? 'h-3.5 w-3.5 text-amber-500 sm:h-4 sm:w-4'
+								: 'h-3.5 w-3.5 text-slate-300 sm:h-4 sm:w-4'
+						}
 						aria-hidden="true"
 					>
 						<path
@@ -62,16 +65,16 @@ function ProductCard({ product }) {
 
 	return (
 		<MotionArticle
-			className="group rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-300"
+			className="group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:border-slate-300 hover:shadow-md sm:p-4"
 			whileHover={{ y: -3 }}
 			transition={{ duration: 0.18, ease: 'easeOut' }}
 		>
 			<div className="relative overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200">
-				<div className="aspect-[4/3] w-full">
+				<div className="aspect-square w-full">
 					<Link
 						to={`/product/${id}`}
 						onClick={() => addRecentlyViewed(id)}
-						className="block"
+						className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
 						aria-label={`View ${name}`}
 					>
 						{image ? (
@@ -87,37 +90,39 @@ function ProductCard({ product }) {
 					</Link>
 				</div>
 
-				<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
-
-				<div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] items-start justify-between gap-2">
+				<div className="absolute left-2 right-2 top-2 flex items-start justify-between gap-2 sm:left-3 sm:right-3 sm:top-3">
 					<div className="inline-flex max-w-[70%] items-center rounded-full bg-white/85 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
 						{category}
 					</div>
-					{hasDiscount ? (
-						<div className="inline-flex items-center rounded-full bg-rose-600 px-2.5 py-1 text-xs font-semibold text-white">
-							Sale
-						</div>
-					) : null}
-					{badge ? (
-						<div className="inline-flex items-center rounded-full bg-slate-950 px-2.5 py-1 text-xs font-semibold text-white">
-							{badge}
+					{hasDiscount || badge ? (
+						<div className="flex flex-col items-end gap-1">
+							{hasDiscount ? (
+								<div className="inline-flex items-center rounded-full bg-rose-600 px-2.5 py-1 text-xs font-semibold text-white">
+									Sale
+								</div>
+							) : null}
+							{badge ? (
+								<div className="inline-flex items-center rounded-full bg-slate-950 px-2.5 py-1 text-xs font-semibold text-white">
+									{badge}
+								</div>
+							) : null}
 						</div>
 					) : null}
 				</div>
 			</div>
 
-			<div className="mt-4">
+			<div className="mt-3 flex flex-1 flex-col sm:mt-4">
 				<div className="flex items-start justify-between gap-3">
 					<div className="min-w-0">
-						<h3 className="truncate text-sm font-semibold text-slate-900">
+						<h3 className="text-xs font-semibold leading-5 text-slate-900 sm:text-sm">
 							<Link to={`/product/${id}`} onClick={() => addRecentlyViewed(id)} className="hover:underline">
-								{name}
+								<span className="line-clamp-2">{name}</span>
 							</Link>
 						</h3>
-						<p className="mt-0.5 text-xs text-slate-600">{category}</p>
+						<p className="mt-0.5 hidden text-xs text-slate-600 sm:block">{category}</p>
 					</div>
 					<div className="text-right">
-						<p className="text-sm font-semibold text-slate-900">{formatMoney(price)}</p>
+						<p className="text-sm font-semibold text-slate-900 sm:text-base">{formatMoney(price)}</p>
 						{compareAtPrice ? (
 							<p className="text-xs text-slate-500 line-through">{formatMoney(compareAtPrice)}</p>
 						) : (
@@ -126,18 +131,9 @@ function ProductCard({ product }) {
 					</div>
 				</div>
 
-				<div className="mt-2 flex items-center justify-between gap-3">
-					<div className="flex items-center gap-2">
-						<Stars rating={rating} />
-						<span className="text-xs text-slate-600">({reviews})</span>
-					</div>
-					<button
-						type="button"
-						className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-900"
-						onClick={() => addToCart(product, 1)}
-					>
-						Add to cart
-					</button>
+				<div className="mt-2 flex items-center gap-2">
+					<Stars rating={rating} />
+					<span className="text-xs text-slate-600">({reviews})</span>
 				</div>
 			</div>
 		</MotionArticle>

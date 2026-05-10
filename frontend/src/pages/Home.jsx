@@ -274,7 +274,7 @@ export default function Home() {
 						{isLoading ? (
 							<p className="mt-8 text-sm text-slate-600">Loading featured products...</p>
 						) : (
-							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{featured.map((product) => (
 									<ProductCard key={product.id} product={product} />
 								))}
@@ -299,7 +299,7 @@ export default function Home() {
 						{isLoading ? (
 							<p className="mt-8 text-sm text-slate-600">Loading latest products...</p>
 						) : (
-							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{latest.map((product) => (
 									<ProductCard key={product.id} product={product} />
 								))}
@@ -322,7 +322,7 @@ export default function Home() {
 								</Link>
 							</div>
 
-							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{recentlyViewed.map((product) => (
 									<ProductCard key={product.id} product={product} />
 								))}

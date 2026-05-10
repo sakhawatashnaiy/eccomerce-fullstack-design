@@ -28,7 +28,7 @@ export default function ProductListing() {
 			<Navbar />
 
 			<main className="bg-slate-50">
-				<div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+				<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 						<div>
 							<h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
@@ -60,7 +60,7 @@ export default function ProductListing() {
 					) : visibleProducts.length === 0 ? (
 						<p className="mt-8 text-sm text-slate-600">No products match your filters.</p>
 					) : (
-						<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<div className="mt-8 grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 							{visibleProducts.map((product) => (
 								<ProductCard key={product.id} product={product} />
 							))}
