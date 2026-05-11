@@ -274,7 +274,7 @@ export default function Cart() {
 												>
 													<div className="flex flex-col gap-4 sm:flex-row sm:items-center">
 														<div className="flex items-start gap-4">
-															<div className="h-20 w-20 overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200">
+															<div className="h-14 w-14 overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200">
 																{item?.image ? (
 																	<img src={item.image} alt={item?.name ?? 'Product'} className="h-full w-full object-cover" />
 																) : (

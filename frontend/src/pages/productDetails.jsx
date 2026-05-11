@@ -66,7 +66,7 @@ export default function ProductDetails() {
 	const wishlistSet = useMemo(() => new Set(wishlistIds), [wishlistIds])
 	const [addWishlistItem] = useAddWishlistItemMutation()
 	const [removeWishlistItem] = useRemoveWishlistItemMutation()
-	const { data: reviews = [] } = useGetProductReviewsQuery(id)
+	const { data: reviews = [] } = useGetProductReviewsQuery(id, { skip: !id })
 	const [createOrUpdateReview, { isLoading: isSubmittingReview }] = useCreateOrUpdateReviewMutation()
 	const { data: recommendations = [] } = useGetProductRecommendationsQuery(
 		{ id, limit: 8 },
@@ -82,6 +82,15 @@ export default function ProductDetails() {
 		() => variants.find((v) => String(v.id) === String(selectedVariantId)) || null,
 		[variants, selectedVariantId]
 	)
+	const colorOptions = useMemo(() => {
+		const map = new Map()
+		for (const variant of variants) {
+			const color = String(variant?.options?.color || '').trim()
+			if (!color) continue
+			if (!map.has(color)) map.set(color, variant)
+		}
+		return Array.from(map.entries()).map(([color, variant]) => ({ color, variant }))
+	}, [variants])
 	const dealActive = useMemo(() => isDealActive(product), [product])
 	const dealPrice = dealActive ? Number(product?.deal?.price) : null
 	const dealCountdown = dealActive ? formatDealCountdown(product?.deal?.endsAt) : ''
@@ -215,6 +224,36 @@ export default function ProductDetails() {
 														{variant.label || variant.id}
 													</button>
 												))}
+											</div>
+										</div>
+									) : null}
+
+									{colorOptions.length ? (
+										<div className="mt-4">
+											<p className="text-xs font-semibold text-slate-600">Choose color</p>
+											<div className="mt-2 flex flex-wrap gap-2">
+												{colorOptions.map(({ color, variant }) => {
+													const isActive = String(variant.id) === String(selectedVariantId)
+													return (
+														<button
+															key={color}
+															type="button"
+															onClick={() => setSelectedVariantId(String(variant.id))}
+															className={
+																'flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ' +
+																(isActive
+																	? 'bg-slate-950 text-white ring-slate-950'
+																	: 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50')
+															}
+														>
+															<span
+																className="h-3 w-3 rounded-full ring-1 ring-slate-200"
+																style={{ backgroundColor: color }}
+															/>
+															{color}
+														</button>
+													)
+												})}
 											</div>
 										</div>
 									) : null}
