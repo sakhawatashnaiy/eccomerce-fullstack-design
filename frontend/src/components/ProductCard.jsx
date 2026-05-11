@@ -72,6 +72,16 @@ function formatDealCountdown(endsAt) {
 	return hours > 0 ? `${hours}h ${mins}m left` : `${mins}m left`
 }
 
+function getCategoryTone(category) {
+	const key = String(category || '').trim().toLowerCase()
+	if (key.includes('phone') || key.includes('mobile')) return 'bg-rose-50 text-rose-700 ring-rose-200'
+	if (key.includes('laptop') || key.includes('computer')) return 'bg-indigo-50 text-indigo-700 ring-indigo-200'
+	if (key.includes('audio') || key.includes('headphone')) return 'bg-amber-50 text-amber-700 ring-amber-200'
+	if (key.includes('fashion') || key.includes('apparel')) return 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+	if (key.includes('home') || key.includes('kitchen')) return 'bg-sky-50 text-sky-700 ring-sky-200'
+	return 'bg-white/85 text-slate-700 ring-slate-200'
+}
+
 function ProductCard({ product, wishlistIds, onToggleWishlist }) {
 	const MotionArticle = motion.article
 	const {
@@ -121,7 +131,12 @@ function ProductCard({ product, wishlistIds, onToggleWishlist }) {
 				</div>
 
 				<div className="absolute left-2 right-2 top-2 flex items-start justify-between gap-2 sm:left-3 sm:right-3 sm:top-3">
-					<div className="inline-flex max-w-[70%] items-center rounded-full bg-white/85 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+					<div
+						className={
+							'inline-flex max-w-[70%] items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ' +
+							getCategoryTone(category)
+						}
+					>
 						{category}
 					</div>
 					<div className="flex items-start gap-2">

@@ -99,6 +99,8 @@ export default function ProductDetails() {
 		: selectedVariant?.price != null
 			? Number(selectedVariant.price)
 			: Number(product?.price)
+	const displayImage =
+		selectedVariant?.image || selectedVariant?.options?.image || product?.image
 
 	useEffect(() => {
 		if (product?.id) addRecentlyViewed(product.id)
@@ -174,8 +176,12 @@ export default function ProductDetails() {
 						<div className="grid gap-8 lg:grid-cols-12">
 							<div className="lg:col-span-7">
 								<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-									<div className="aspect-[2/2] object-fit bg-slate-100">
-										<img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+									<div className="mx-auto flex aspect-square max-h-[420px] max-w-[420px] items-center justify-center bg-slate-100 p-6">
+										<img
+											src={displayImage}
+											alt={product.name}
+											className="max-h-full max-w-full object-contain"
+										/>
 									</div>
 								</div>
 							</div>
