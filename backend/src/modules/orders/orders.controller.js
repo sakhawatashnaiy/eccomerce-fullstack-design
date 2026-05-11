@@ -6,6 +6,8 @@ const {
 	readOrdersByUser,
 	readAllOrders,
 	readOrderById,
+	readOrderByIdForUser,
+	readOrderTrackingForUser,
 	createOrderForUser,
 	updateOrderById,
 } = require('./orders.service')
@@ -18,6 +20,16 @@ async function listMyOrders(req, res) {
 async function createMyOrder(req, res) {
 	const data = await createOrderForUser(req.user.uid, req.body)
 	res.status(201).json({ ok: true, data })
+}
+
+async function getMyOrder(req, res) {
+	const data = await readOrderByIdForUser(req.user.uid, req.params.id)
+	res.status(200).json({ ok: true, data })
+}
+
+async function getMyOrderTracking(req, res) {
+	const data = await readOrderTrackingForUser(req.user.uid, req.params.id)
+	res.status(200).json({ ok: true, data })
 }
 
 async function listAllOrders(req, res) {
@@ -35,4 +47,12 @@ async function patchOrder(req, res) {
 	res.status(200).json({ ok: true, data })
 }
 
-module.exports = { listMyOrders, createMyOrder, listAllOrders, getOrder, patchOrder }
+module.exports = {
+	listMyOrders,
+	createMyOrder,
+	getMyOrder,
+	getMyOrderTracking,
+	listAllOrders,
+	getOrder,
+	patchOrder,
+}

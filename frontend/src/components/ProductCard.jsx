@@ -4,7 +4,7 @@
  */
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { addRecentlyViewed } from '../utils/recentlyViewed.js'
 
 function formatMoney(value) {
@@ -47,7 +47,32 @@ const Stars = memo(function Stars({ rating = 0 }) {
 	)
 })
 
-function ProductCard({ product }) {
+function isDealActive(product) {
+	const deal = product?.deal
+	if (!deal || typeof deal !== 'object') return false
+	if (!(Number(deal.price) > 0)) return false
+	if (deal.startsAt) {
+		const starts = new Date(deal.startsAt)
+		if (!Number.isNaN(starts.getTime()) && Date.now() < starts.getTime()) return false
+	}
+	if (deal.endsAt) {
+		const ends = new Date(deal.endsAt)
+		if (!Number.isNaN(ends.getTime()) && Date.now() > ends.getTime()) return false
+	}
+	return true
+}
+
+function formatDealCountdown(endsAt) {
+	if (!endsAt) return ''
+	const end = new Date(endsAt).getTime()
+	if (Number.isNaN(end)) return ''
+	const diff = Math.max(0, end - Date.now())
+	const hours = Math.floor(diff / 1000 / 60 / 60)
+	const mins = Math.floor((diff / 1000 / 60) % 60)
+	return hours > 0 ? `${hours}h ${mins}m left` : `${mins}m left`
+}
+
+function ProductCard({ product, wishlistIds, onToggleWishlist }) {
 	const MotionArticle = motion.article
 	const {
 		id,
@@ -61,7 +86,12 @@ function ProductCard({ product }) {
 		image,
 	} = product
 
+	const dealActive = useMemo(() => isDealActive(product), [product])
+	const dealPrice = dealActive ? Number(product?.deal?.price) : null
+	const dealLabel = product?.deal?.label || 'Flash deal'
+	const dealCountdown = dealActive ? formatDealCountdown(product?.deal?.endsAt) : ''
 	const hasDiscount = typeof compareAtPrice === 'number' && compareAtPrice > price
+	const isWishlisted = Boolean(wishlistIds && wishlistIds.has(id))
 
 	return (
 		<MotionArticle
@@ -94,6 +124,39 @@ function ProductCard({ product }) {
 					<div className="inline-flex max-w-[70%] items-center rounded-full bg-white/85 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
 						{category}
 					</div>
+					<div className="flex items-start gap-2">
+						{dealActive ? (
+							<div className="inline-flex items-center rounded-full bg-rose-600 px-2.5 py-1 text-xs font-semibold text-white">
+								{dealLabel}
+							</div>
+						) : null}
+						{onToggleWishlist ? (
+							<button
+								type="button"
+								onClick={(e) => {
+									e.preventDefault()
+									onToggleWishlist(product)
+								}}
+								className={
+									'inline-flex h-8 w-8 items-center justify-center rounded-full ring-1 transition-colors ' +
+									(isWishlisted
+										? 'bg-rose-600 text-white ring-rose-600'
+										: 'bg-white/90 text-slate-700 ring-slate-200 hover:bg-white')
+								}
+								aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+							>
+								<svg viewBox="0 0 24 24" fill={isWishlisted ? 'currentColor' : 'none'} className="h-4 w-4" aria-hidden="true">
+									<path
+										d="M12 21l-1.5-1.3C6 15.7 3 12.9 3 9.7 3 7.5 4.8 5.8 7 5.8c1.4 0 2.8.7 3.6 1.9C11.2 6.5 12.6 5.8 14 5.8c2.2 0 4 1.7 4 3.9 0 3.2-3 6-7.5 10L12 21z"
+										stroke="currentColor"
+										strokeWidth="1.6"
+										strokeLinejoin="round"
+										strokeLinecap="round"
+									/>
+								</svg>
+							</button>
+						) : null}
+					</div>
 					{hasDiscount || badge ? (
 						<div className="flex flex-col items-end gap-1">
 							{hasDiscount ? (
@@ -122,12 +185,15 @@ function ProductCard({ product }) {
 						<p className="mt-0.5 hidden text-xs text-slate-600 sm:block">{category}</p>
 					</div>
 					<div className="text-right">
-						<p className="text-sm font-semibold text-slate-900 sm:text-base">{formatMoney(price)}</p>
-						{compareAtPrice ? (
-							<p className="text-xs text-slate-500 line-through">{formatMoney(compareAtPrice)}</p>
+						<p className="text-sm font-semibold text-slate-900 sm:text-base">
+							{formatMoney(dealPrice ?? price)}
+						</p>
+						{dealActive || compareAtPrice ? (
+							<p className="text-xs text-slate-500 line-through">{formatMoney(compareAtPrice || price)}</p>
 						) : (
 							<p className="text-xs text-slate-500">&nbsp;</p>
 						)}
+						{dealCountdown ? <p className="text-[11px] text-rose-600">{dealCountdown}</p> : null}
 					</div>
 				</div>
 
@@ -141,4 +207,3 @@ function ProductCard({ product }) {
 }
 
 export default memo(ProductCard)
-

@@ -14,7 +14,8 @@ import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import { clearCart, getCartItems } from '../utils/cart.js'
 import { isSignedIn } from '../utils/authSession.js'
-import { useCreateMyOrderMutation } from '../services/apiSlice.js'
+import { useCreateMyOrderMutation, useValidateCouponMutation } from '../services/apiSlice.js'
+import { getAppliedCoupon, setAppliedCoupon, subscribeCouponUpdated } from '../utils/couponSession.js'
 
 function formatMoney(value) {
 	try {
@@ -38,6 +39,8 @@ export default function Checkout() {
 	const [orderPlaced, setOrderPlaced] = useState(false)
 	const [submitError, setSubmitError] = useState('')
 	const [createMyOrder] = useCreateMyOrderMutation()
+	const [appliedCoupon, setAppliedCouponState] = useState(() => getAppliedCoupon())
+	const [validateCoupon] = useValidateCouponMutation()
 
 	// 2) Minimal form state (UI-only).
 	//    This is intentionally lightweight: no backend calls and no payment processing.
@@ -61,6 +64,12 @@ export default function Checkout() {
 		}
 	}, [])
 
+	useEffect(() => {
+		const refresh = () => setAppliedCouponState(getAppliedCoupon())
+		refresh()
+		return subscribeCouponUpdated(refresh)
+	}, [])
+
 	// 3) Recompute totals exactly like Cart page.
 	const subtotal = useMemo(() => {
 		return items.reduce((sum, item) => sum + (Number(item?.price) || 0) * (Number(item?.qty) || 0), 0)
@@ -72,7 +81,28 @@ export default function Checkout() {
 
 	const shipping = useMemo(() => (subtotal >= 250 ? 0 : items.length ? 15 : 0), [subtotal, items.length])
 	const tax = useMemo(() => Math.round(subtotal * 0.08), [subtotal])
-	const total = useMemo(() => subtotal + shipping + tax, [subtotal, shipping, tax])
+	const discount = useMemo(() => Math.max(0, Number(appliedCoupon?.amountOff) || 0), [appliedCoupon?.amountOff])
+	const total = useMemo(() => Math.max(0, subtotal + shipping + tax - discount), [subtotal, shipping, tax, discount])
+
+	useEffect(() => {
+		let ignore = false
+		const current = getAppliedCoupon()
+		if (!current?.code) return undefined
+		validateCoupon({ code: current.code, subtotal })
+			.unwrap()
+			.then((result) => {
+				if (ignore) return
+				if (result?.data?.ok) {
+					setAppliedCoupon({ ...current, ...result.data })
+				} else {
+					setAppliedCoupon(null)
+				}
+			})
+			.catch(() => undefined)
+		return () => {
+			ignore = true
+		}
+	}, [subtotal, validateCoupon])
 
 	const isEmpty = items.length === 0
 
@@ -102,6 +132,7 @@ export default function Checkout() {
 				shipping,
 				tax,
 				total,
+				couponCode: appliedCoupon?.code || '',
 				customer: {
 					name: form.fullName,
 					email: form.email,
@@ -351,6 +382,9 @@ export default function Checkout() {
 															</div>
 															<div className="min-w-0">
 																<p className="truncate text-sm font-semibold text-slate-900">{item?.name ?? 'Item'}</p>
+																{item?.variantLabel ? (
+																	<p className="mt-0.5 text-xs text-slate-500">Variant: {item.variantLabel}</p>
+																) : null}
 																<p className="mt-0.5 text-xs text-slate-600">Qty {qty}</p>
 															</div>
 														</div>
@@ -373,6 +407,12 @@ export default function Checkout() {
 												<span className="text-slate-600">Estimated tax</span>
 												<span className="font-semibold text-slate-900">{formatMoney(tax)}</span>
 											</div>
+											{discount > 0 ? (
+												<div className="flex items-center justify-between text-emerald-700">
+													<span>Coupon discount</span>
+													<span className="font-semibold">- {formatMoney(discount)}</span>
+												</div>
+											) : null}
 										</div>
 
 										<div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">

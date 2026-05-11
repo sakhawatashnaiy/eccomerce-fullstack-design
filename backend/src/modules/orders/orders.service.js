@@ -3,6 +3,7 @@
  */
 
 const { getFirebaseAdmin } = require('../../config/firebaseAdmin')
+const { validateCoupon } = require('../coupons/coupons.service')
 
 const ORDER_STATUSES = ['pending', 'shipped', 'delivered', 'cancelled']
 const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded']
@@ -73,6 +74,44 @@ async function readOrderById(orderId) {
 	return { id: doc.id, ...doc.data() }
 }
 
+async function readOrderByIdForUser(uid, orderId) {
+	const order = await readOrderById(orderId)
+	if (String(order.uid || '') !== String(uid || '')) {
+		const error = new Error('Order not found')
+		error.status = 404
+		throw error
+	}
+	return order
+}
+
+async function readOrderTrackingForUser(uid, orderId) {
+	const order = await readOrderByIdForUser(uid, orderId)
+	const history = Array.isArray(order.statusHistory) ? order.statusHistory : []
+	return {
+		orderId: order.id,
+		status: order.status,
+		events: history,
+		createdAt: order.createdAt || null,
+		shippedAt: order.shippedAt || null,
+		deliveredAt: order.deliveredAt || null,
+		cancelledAt: order.cancelledAt || null,
+	}
+}
+
+function safeNumber(value) {
+	const n = Number(value)
+	return Number.isFinite(n) ? n : 0
+}
+
+function computeSubtotalFromItems(items) {
+	if (!Array.isArray(items)) return 0
+	return items.reduce((sum, item) => {
+		const price = safeNumber(item?.price)
+		const qty = Math.max(0, Math.floor(safeNumber(item?.qty) || 0))
+		return sum + price * qty
+	}, 0)
+}
+
 async function createOrderForUser(uid, payload) {
 	const { db } = getFirebaseAdmin()
 	const {
@@ -84,6 +123,8 @@ async function createOrderForUser(uid, payload) {
 		customer = {},
 		shippingAddress = {},
 		payment = {},
+		coupon,
+		couponCode,
 	} = payload || {}
 
 	if (!Array.isArray(items) || items.length === 0) {
@@ -95,14 +136,40 @@ async function createOrderForUser(uid, payload) {
 	const paymentMethod = normalizePaymentMethod(payment?.method) || 'cod'
 	if (paymentMethod) assertAllowed(paymentMethod, PAYMENT_METHODS, 'payment method')
 
+	const computedSubtotal = computeSubtotalFromItems(items) || safeNumber(subtotal)
+	const computedShipping = safeNumber(shipping)
+	const computedTax = safeNumber(tax)
+
+	const code = String(coupon?.code || couponCode || '').trim()
+	let discount = { code: null, amount: 0 }
+	if (code) {
+		const result = await validateCoupon(code, computedSubtotal)
+		if (result.ok) {
+			discount = { code: result.code, amount: Number(result.amountOff) || 0 }
+		}
+	}
+
+	const computedTotal = Math.max(
+		0,
+		computedSubtotal + computedShipping + computedTax - (Number(discount.amount) || 0)
+	)
+
 	const order = {
 		uid,
 		items,
-		subtotal,
-		shipping,
-		tax,
-		total,
+		subtotal: computedSubtotal,
+		shipping: computedShipping,
+		tax: computedTax,
+		discount,
+		total: computedTotal || safeNumber(total),
 		status: 'pending',
+		statusHistory: [
+			{
+				status: 'pending',
+				at: new Date().toISOString(),
+				label: 'Placed',
+			},
+		],
 		customer: {
 			name: String(customer?.name || ''),
 			email: String(customer?.email || ''),
@@ -151,6 +218,9 @@ async function updateOrderById(orderId, patch) {
 		const from = normalizeStatus(current.status) || 'pending'
 		assertCanTransition(from, to)
 		next.status = to
+		const history = Array.isArray(current.statusHistory) ? current.statusHistory : []
+		history.push({ status: to, at: new Date().toISOString(), label: to })
+		next.statusHistory = history.slice(-20)
 		if (to === 'shipped') next.shippedAt = new Date().toISOString()
 		if (to === 'delivered') next.deliveredAt = new Date().toISOString()
 		if (to === 'cancelled') next.cancelledAt = new Date().toISOString()
@@ -204,6 +274,8 @@ module.exports = {
 	readOrdersByUser,
 	readAllOrders,
 	readOrderById,
+	readOrderByIdForUser,
+	readOrderTrackingForUser,
 	createOrderForUser,
 	updateOrderById,
 }

@@ -9,6 +9,9 @@ const {
 	updateProductDoc,
 	deleteProductDoc,
 	seedProductCollection,
+	readProductRecommendations,
+	readProductReviews,
+	upsertProductReview,
 } = require('./products.service')
 
 async function listProducts(req, res) {
@@ -56,6 +59,25 @@ async function seedProducts(_req, res) {
 	res.status(200).json({ ok: true, data })
 }
 
+async function listProductRecommendations(req, res) {
+	const data = await readProductRecommendations(req.params.id, { limit: req.query.limit })
+	res.status(200).json({ ok: true, data })
+}
+
+async function listProductReviews(req, res) {
+	const data = await readProductReviews(req.params.id)
+	res.status(200).json({ ok: true, data })
+}
+
+async function createOrUpdateMyReview(req, res) {
+	const payload = {
+		...req.body,
+		displayName: req.user?.name || req.user?.email || null,
+	}
+	const data = await upsertProductReview(req.user.uid, req.params.id, payload)
+	res.status(201).json({ ok: true, data })
+}
+
 module.exports = {
 	listProducts,
 	getProductById,
@@ -63,4 +85,7 @@ module.exports = {
 	updateProduct,
 	deleteProduct,
 	seedProducts,
+	listProductRecommendations,
+	listProductReviews,
+	createOrUpdateMyReview,
 }

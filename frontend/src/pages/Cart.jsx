@@ -8,6 +8,9 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import { clearCart, getCartItems, removeFromCart, setCartItemQty } from '../utils/cart.js'
+import { getAppliedCoupon, setAppliedCoupon, subscribeCouponUpdated } from '../utils/couponSession.js'
+import { useValidateCouponMutation } from '../services/apiSlice.js'
+import { isSignedIn } from '../utils/authSession.js'
 
 function formatMoney(value) {
 	try {
@@ -33,6 +36,10 @@ export default function Cart() {
 	const [removing, setRemoving] = useState(() => new Set())
 	const [poppingId, setPoppingId] = useState(null)
 	const timeoutsRef = useRef([])
+	const [couponCode, setCouponCode] = useState(() => getAppliedCoupon()?.code || '')
+	const [couponFeedback, setCouponFeedback] = useState('')
+	const [appliedCoupon, setAppliedCouponState] = useState(() => getAppliedCoupon())
+	const [validateCoupon, { isLoading: isValidating }] = useValidateCouponMutation()
 
 	useEffect(() => {
 		const refresh = () => setItems(getCartItems())
@@ -52,6 +59,12 @@ export default function Cart() {
 		}
 	}, [])
 
+	useEffect(() => {
+		const refresh = () => setAppliedCouponState(getAppliedCoupon())
+		refresh()
+		return subscribeCouponUpdated(refresh)
+	}, [])
+
 	const subtotal = useMemo(() => {
 		return items.reduce((sum, item) => sum + (Number(item?.price) || 0) * (Number(item?.qty) || 0), 0)
 	}, [items])
@@ -62,7 +75,34 @@ export default function Cart() {
 
 	const shipping = useMemo(() => (subtotal >= 250 ? 0 : items.length ? 15 : 0), [subtotal, items.length])
 	const tax = useMemo(() => Math.round(subtotal * 0.08), [subtotal])
-	const total = useMemo(() => subtotal + shipping + tax, [subtotal, shipping, tax])
+	const discount = useMemo(() => Math.max(0, Number(appliedCoupon?.amountOff) || 0), [appliedCoupon?.amountOff])
+	const total = useMemo(() => Math.max(0, subtotal + shipping + tax - discount), [subtotal, shipping, tax, discount])
+
+	useEffect(() => {
+		let ignore = false
+		const current = getAppliedCoupon()
+		if (!current?.code) return undefined
+		validateCoupon({ code: current.code, subtotal })
+			.unwrap()
+			.then((result) => {
+				if (ignore) return
+				if (result?.data?.ok) {
+					const updated = { ...current, ...result.data }
+					setAppliedCoupon(updated)
+					setCouponFeedback('')
+				} else {
+					setAppliedCoupon(null)
+					setCouponFeedback(result?.data?.reason || 'Coupon is no longer valid.')
+				}
+			})
+			.catch(() => {
+				if (ignore) return
+				setCouponFeedback('Could not revalidate coupon. Please try again.')
+			})
+		return () => {
+			ignore = true
+		}
+	}, [subtotal, validateCoupon])
 
 	const setQty = (id, nextQty) => {
 		const qty = clampQty(nextQty)
@@ -87,6 +127,38 @@ export default function Cart() {
 			})
 		}, 180)
 		timeoutsRef.current.push(t)
+	}
+
+	const applyCoupon = async () => {
+		const code = String(couponCode || '').trim()
+		if (!code) {
+			setCouponFeedback('Enter a coupon code to apply.')
+			return
+		}
+		if (!isSignedIn()) {
+			setCouponFeedback('Please sign in to apply coupons.')
+			return
+		}
+		setCouponFeedback('')
+		try {
+			const result = await validateCoupon({ code, subtotal }).unwrap()
+			if (result?.data?.ok) {
+				const payload = { code: result.data.code, amountOff: result.data.amountOff, minSubtotal: result.data.minSubtotal, expiresAt: result.data.expiresAt }
+				setAppliedCoupon(payload)
+				setCouponFeedback('Coupon applied.')
+			} else {
+				setAppliedCoupon(null)
+				setCouponFeedback(result?.data?.reason || 'Coupon is not valid.')
+			}
+		} catch (error) {
+			const message = error?.data?.message || error?.error || 'Could not apply coupon.'
+			setCouponFeedback(String(message))
+		}
+	}
+
+	const removeCoupon = () => {
+		setAppliedCoupon(null)
+		setCouponFeedback('Coupon removed.')
 	}
 
 	return (
@@ -226,6 +298,9 @@ export default function Cart() {
 																>
 																	{item?.name ?? 'Item'}
 																</MotionP>
+																{item?.variantLabel ? (
+																	<p className="mt-1 text-xs text-slate-500">Variant: {item.variantLabel}</p>
+																) : null}
 																<p className="mt-1 text-sm text-slate-600">{formatMoney(price)} each</p>
 																<button
 																	type="button"
@@ -315,6 +390,45 @@ export default function Cart() {
 												<span className="text-slate-600">Estimated tax</span>
 												<span className="font-semibold text-slate-900">{formatMoney(tax)}</span>
 											</div>
+											{discount > 0 ? (
+												<div className="flex items-center justify-between text-emerald-700">
+													<span>Coupon discount</span>
+													<span className="font-semibold">- {formatMoney(discount)}</span>
+												</div>
+											) : null}
+										</div>
+
+										<div className="mt-4 rounded-xl border border-slate-200 p-3">
+											<p className="text-xs font-semibold text-slate-700">Have a coupon?</p>
+											<div className="mt-2 flex gap-2">
+												<input
+													type="text"
+													value={couponCode}
+													onChange={(e) => setCouponCode(e.target.value)}
+													placeholder="Enter code"
+													className="h-10 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 placeholder:text-slate-400"
+												/>
+												<button
+													type="button"
+													onClick={applyCoupon}
+													disabled={isValidating}
+													className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-3 text-xs font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+												>
+													{isValidating ? 'Checking…' : 'Apply'}
+												</button>
+												{appliedCoupon?.code ? (
+													<button
+														type="button"
+														onClick={removeCoupon}
+														className="inline-flex items-center justify-center rounded-lg px-3 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+													>
+														Remove
+													</button>
+												) : null}
+											</div>
+											{couponFeedback ? (
+												<p className="mt-2 text-xs text-slate-600">{couponFeedback}</p>
+											) : null}
 										</div>
 
 										<div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">

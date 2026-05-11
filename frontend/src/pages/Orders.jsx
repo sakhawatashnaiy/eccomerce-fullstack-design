@@ -61,9 +61,10 @@ function progressFromStatus(status) {
 	return { state: 'pending', index: 0 }
 }
 
-function Timeline({ status }) {
+function Timeline({ status, history = [] }) {
 	const { state, index } = progressFromStatus(status)
 	const steps = ['Placed', 'Shipped', 'Delivered']
+	const events = Array.isArray(history) ? history : []
 
 	if (state === 'cancelled') {
 		return (
@@ -96,6 +97,18 @@ function Timeline({ status }) {
 					)
 				})}
 			</div>
+			{events.length ? (
+				<ul className="mt-3 space-y-1 text-xs text-slate-600">
+					{events
+						.slice(-4)
+						.map((event, i) => (
+							<li key={`${event.status}-${i}`} className="flex items-center justify-between">
+								<span className="capitalize">{String(event.label || event.status)}</span>
+								<span>{formatDateTime(event.at)}</span>
+							</li>
+						))}
+				</ul>
+			) : null}
 		</div>
 	)
 }
@@ -105,7 +118,9 @@ function safeItems(order) {
 }
 
 function getItemLabel(item) {
-	return String(item?.title || item?.name || item?.productTitle || item?.productName || 'Item')
+	const base = String(item?.title || item?.name || item?.productTitle || item?.productName || 'Item')
+	const variant = item?.variantLabel ? ` (${item.variantLabel})` : ''
+	return `${base}${variant}`
 }
 
 function countItems(items) {
@@ -118,7 +133,8 @@ function orderTotal(order) {
 	const subtotal = Number(order?.subtotal) || 0
 	const shipping = Number(order?.shipping) || 0
 	const tax = Number(order?.tax) || 0
-	return subtotal + shipping + tax
+	const discount = Number(order?.discount?.amount) || 0
+	return Math.max(0, subtotal + shipping + tax - discount)
 }
 
 export default function Orders() {
@@ -388,7 +404,7 @@ export default function Orders() {
 														</div>
 													</div>
 
-													<Timeline status={order?.status} />
+													<Timeline status={order?.status} history={order?.statusHistory} />
 
 														{items.length ? (
 														<div className="mt-5">

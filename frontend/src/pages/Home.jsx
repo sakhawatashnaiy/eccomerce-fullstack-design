@@ -8,7 +8,13 @@ import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { getRecentlyViewedIds } from '../utils/recentlyViewed.js'
-import { useGetProductsQuery } from '../services/apiSlice.js'
+import {
+	useAddWishlistItemMutation,
+	useGetMyWishlistQuery,
+	useGetProductsQuery,
+	useRemoveWishlistItemMutation,
+} from '../services/apiSlice.js'
+import { isSignedIn } from '../utils/authSession.js'
 
 function parseDate(value) {
 	const d = new Date(value)
@@ -153,6 +159,21 @@ function buildCategoryCards(allProducts) {
 		.map(([name, count]) => ({ name, count }))
 }
 
+function isDealActive(product) {
+	const deal = product?.deal
+	if (!deal || typeof deal !== 'object') return false
+	if (!(Number(deal.price) > 0)) return false
+	if (deal.startsAt) {
+		const starts = new Date(deal.startsAt)
+		if (!Number.isNaN(starts.getTime()) && Date.now() < starts.getTime()) return false
+	}
+	if (deal.endsAt) {
+		const ends = new Date(deal.endsAt)
+		if (!Number.isNaN(ends.getTime()) && Date.now() > ends.getTime()) return false
+	}
+	return true
+}
+
 const promoSlides = [
 	{
 		tag: 'Limited time',
@@ -175,8 +196,14 @@ const promoSlides = [
 export default function Home() {
 	const [recentIds, setRecentIds] = useState(() => getRecentlyViewedIds())
 	const { data: allProducts = [], isLoading, isError } = useGetProductsQuery()
+	const signedIn = isSignedIn()
+	const { data: wishlistIds = [] } = useGetMyWishlistQuery(undefined, { skip: !signedIn })
+	const [addWishlistItem] = useAddWishlistItemMutation()
+	const [removeWishlistItem] = useRemoveWishlistItemMutation()
+	const wishlistSet = useMemo(() => new Set(wishlistIds), [wishlistIds])
 
 	const featured = useMemo(() => getFeatured(allProducts).slice(0, 8), [allProducts])
+	const flashDeals = useMemo(() => allProducts.filter(isDealActive).slice(0, 8), [allProducts])
 	const latest = useMemo(() => getLatest(allProducts).slice(0, 8), [allProducts])
 	const categories = useMemo(() => buildCategoryCards(allProducts), [allProducts])
 
@@ -198,6 +225,24 @@ export default function Home() {
 			window.removeEventListener('storage', refresh)
 		}
 	}, [])
+
+	const handleToggleWishlist = async (product) => {
+		if (!signedIn) {
+			window.alert('Please sign in to use wishlist.')
+			return
+		}
+		const id = product?.id
+		if (!id) return
+		try {
+			if (wishlistSet.has(id)) {
+				await removeWishlistItem(id).unwrap()
+			} else {
+				await addWishlistItem(id).unwrap()
+			}
+		} catch {
+			// Silent fail for now
+		}
+	}
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">
@@ -276,12 +321,43 @@ export default function Home() {
 						) : (
 							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{featured.map((product) => (
-									<ProductCard key={product.id} product={product} />
+									<ProductCard
+										key={product.id}
+										product={product}
+										wishlistIds={wishlistSet}
+										onToggleWishlist={handleToggleWishlist}
+									/>
 								))}
 							</div>
 						)}
 					</div>
 				</section>
+
+						{flashDeals.length ? (
+							<section id="deals" className="bg-white">
+								<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+									<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+										<div>
+											<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Flash deals</h2>
+											<p className="mt-2 text-sm text-slate-600">Limited-time prices while stock lasts.</p>
+										</div>
+										<Link to="/products?deals=true" className="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-500">
+											View all deals
+										</Link>
+									</div>
+									<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+										{flashDeals.map((product) => (
+											<ProductCard
+												key={product.id}
+												product={product}
+												wishlistIds={wishlistSet}
+												onToggleWishlist={handleToggleWishlist}
+											/>
+										))}
+									</div>
+								</div>
+							</section>
+						) : null}
 
 				{/* Latest / new arrivals (createdAt DESC) */}
 				<section id="latest" className="bg-white">
@@ -301,7 +377,12 @@ export default function Home() {
 						) : (
 							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{latest.map((product) => (
-									<ProductCard key={product.id} product={product} />
+									<ProductCard
+										key={product.id}
+										product={product}
+										wishlistIds={wishlistSet}
+										onToggleWishlist={handleToggleWishlist}
+									/>
 								))}
 							</div>
 						)}
@@ -324,7 +405,12 @@ export default function Home() {
 
 							<div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
 								{recentlyViewed.map((product) => (
-									<ProductCard key={product.id} product={product} />
+									<ProductCard
+										key={product.id}
+										product={product}
+										wishlistIds={wishlistSet}
+										onToggleWishlist={handleToggleWishlist}
+									/>
 								))}
 							</div>
 						</div>

@@ -24,6 +24,12 @@ const initialForm = {
 	category: '',
 	stocks: '',
 	isFeatured: false,
+	sellerId: '',
+	sellerName: '',
+	dealPrice: '',
+	dealEndsAt: '',
+	dealLabel: 'Flash deal',
+	variantsJson: '',
 }
 
 function fileToDataUrl(file, { maxDimension = 1400, quality = 0.82 } = {}) {
@@ -173,6 +179,12 @@ export default function AdminProducts() {
 			category: product.category ?? '',
 			stocks: product.stocks ?? '',
 			isFeatured: Boolean(product.isFeatured),
+			sellerId: product.sellerId ?? '',
+			sellerName: product.seller?.name ?? '',
+			dealPrice: product.deal?.price ?? '',
+			dealEndsAt: product.deal?.endsAt ?? '',
+			dealLabel: product.deal?.label ?? 'Flash deal',
+			variantsJson: product.variants ? JSON.stringify(product.variants, null, 2) : '',
 		})
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
@@ -185,6 +197,28 @@ export default function AdminProducts() {
 			return
 		}
 
+		let variants = []
+		if (String(form.variantsJson || '').trim()) {
+			try {
+				const parsed = JSON.parse(form.variantsJson)
+				variants = Array.isArray(parsed) ? parsed : []
+			} catch {
+				setFeedback({ type: 'error', message: 'Variants JSON is invalid.' })
+				return
+			}
+		}
+
+		const dealPrice = String(form.dealPrice || '').trim()
+		const dealEndsAt = String(form.dealEndsAt || '').trim()
+		const dealLabel = String(form.dealLabel || '').trim()
+		const deal = dealPrice
+			? {
+				price: Number(dealPrice),
+				endsAt: dealEndsAt || null,
+				label: dealLabel || 'Flash deal',
+			}
+			: null
+
 		const payload = {
 			...(editingId ? {} : { id: form.id.trim() || undefined }),
 			name: form.name.trim(),
@@ -194,6 +228,10 @@ export default function AdminProducts() {
 			category: form.category.trim(),
 			stocks: Number(form.stocks),
 			isFeatured: Boolean(form.isFeatured),
+			sellerId: form.sellerId.trim() || undefined,
+			sellerName: form.sellerName.trim() || undefined,
+			deal: deal || undefined,
+			variants: variants.length ? variants : undefined,
 		}
 
 		try {
@@ -341,6 +379,53 @@ export default function AdminProducts() {
 											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
 										/>
 									</div>
+									<div className="grid gap-3 sm:grid-cols-2">
+										<input
+											type="text"
+											placeholder="Seller ID (optional)"
+											value={form.sellerId}
+											onChange={onChange('sellerId')}
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										/>
+										<input
+											type="text"
+											placeholder="Seller name (optional)"
+											value={form.sellerName}
+											onChange={onChange('sellerName')}
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										/>
+									</div>
+									<div className="grid gap-3 sm:grid-cols-3">
+										<input
+											type="number"
+											min="0"
+											placeholder="Deal price (optional)"
+											value={form.dealPrice}
+											onChange={onChange('dealPrice')}
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										/>
+										<input
+											type="text"
+											placeholder="Deal ends at (ISO, optional)"
+											value={form.dealEndsAt}
+											onChange={onChange('dealEndsAt')}
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										/>
+										<input
+											type="text"
+											placeholder="Deal label"
+											value={form.dealLabel}
+											onChange={onChange('dealLabel')}
+											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										/>
+									</div>
+									<textarea
+										placeholder="Variants JSON (optional)"
+										value={form.variantsJson}
+										onChange={onChange('variantsJson')}
+										rows={3}
+										className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+									/>
 
 									<label className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700">
 										<span className="font-semibold text-slate-900">Featured product</span>

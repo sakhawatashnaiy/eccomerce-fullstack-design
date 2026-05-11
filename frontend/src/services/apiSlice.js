@@ -20,7 +20,7 @@ export const apiSlice = createApi({
 			return headers
 		},
 	}),
-	tagTypes: ['Products', 'Orders'],
+	tagTypes: ['Products', 'Orders', 'Wishlist', 'Reviews', 'Coupons', 'Sellers'],
 	endpoints: (builder) => ({
 		getProducts: builder.query({
 			query: (params = {}) => {
@@ -40,6 +40,25 @@ export const apiSlice = createApi({
 			query: (id) => `/products/${id}`,
 			transformResponse: (response) => response?.data,
 			providesTags: (_result, _error, id) => [{ type: 'Products', id }],
+		}),
+		getProductReviews: builder.query({
+			query: (id) => `/products/${id}/reviews`,
+			transformResponse: (response) => response?.data ?? [],
+			providesTags: (_result, _error, id) => [{ type: 'Reviews', id }],
+		}),
+		createOrUpdateReview: builder.mutation({
+			query: ({ id, ...payload }) => ({ url: `/products/${id}/reviews`, method: 'POST', body: payload }),
+			invalidatesTags: (_result, _error, { id }) => [
+				{ type: 'Reviews', id },
+				{ type: 'Products', id },
+			],
+		}),
+		getProductRecommendations: builder.query({
+			query: ({ id, limit }) => {
+				const suffix = limit ? `?limit=${encodeURIComponent(String(limit))}` : ''
+				return `/products/${id}/recommendations${suffix}`
+			},
+			transformResponse: (response) => response?.data ?? [],
 		}),
 		createProduct: builder.mutation({
 			query: (payload) => ({ url: '/products', method: 'POST', body: payload }),
@@ -65,9 +84,39 @@ export const apiSlice = createApi({
 					? [{ type: 'Orders', id: 'LIST' }, ...result.map((o) => ({ type: 'Orders', id: o?.id }))]
 					: [{ type: 'Orders', id: 'LIST' }],
 		}),
+		getMyOrderTracking: builder.query({
+			query: (id) => `/orders/me/${id}/tracking`,
+			transformResponse: (response) => response?.data,
+			providesTags: (_result, _error, id) => [{ type: 'Orders', id }],
+		}),
 		createMyOrder: builder.mutation({
 			query: (payload) => ({ url: '/orders/me', method: 'POST', body: payload }),
 			invalidatesTags: [{ type: 'Orders', id: 'LIST' }],
+		}),
+		getMyWishlist: builder.query({
+			query: () => '/wishlist/me',
+			transformResponse: (response) => response?.data ?? [],
+			providesTags: [{ type: 'Wishlist', id: 'LIST' }],
+		}),
+		addWishlistItem: builder.mutation({
+			query: (productId) => ({ url: `/wishlist/me/${productId}`, method: 'PUT' }),
+			invalidatesTags: [{ type: 'Wishlist', id: 'LIST' }],
+		}),
+		removeWishlistItem: builder.mutation({
+			query: (productId) => ({ url: `/wishlist/me/${productId}`, method: 'DELETE' }),
+			invalidatesTags: [{ type: 'Wishlist', id: 'LIST' }],
+		}),
+		validateCoupon: builder.mutation({
+			query: (payload) => ({ url: '/coupons/validate', method: 'POST', body: payload }),
+		}),
+		getSellerById: builder.query({
+			query: (id) => `/sellers/${id}`,
+			transformResponse: (response) => response?.data,
+			providesTags: (_result, _error, id) => [{ type: 'Sellers', id }],
+		}),
+		getSellerProducts: builder.query({
+			query: (id) => `/sellers/${id}/products`,
+			transformResponse: (response) => response?.data ?? [],
 		}),
 		getAdminOrders: builder.query({
 			query: () => '/orders/admin',
@@ -92,12 +141,22 @@ export const apiSlice = createApi({
 export const {
 	useGetProductsQuery,
 	useGetProductByIdQuery,
+	useGetProductReviewsQuery,
+	useCreateOrUpdateReviewMutation,
+	useGetProductRecommendationsQuery,
 	useCreateProductMutation,
 	useUpdateProductMutation,
 	useDeleteProductMutation,
 	useSeedProductsMutation,
 	useGetMyOrdersQuery,
+	useGetMyOrderTrackingQuery,
 	useCreateMyOrderMutation,
+	useGetMyWishlistQuery,
+	useAddWishlistItemMutation,
+	useRemoveWishlistItemMutation,
+	useValidateCouponMutation,
+	useGetSellerByIdQuery,
+	useGetSellerProductsQuery,
 	useGetAdminOrdersQuery,
 	useGetAdminOrderByIdQuery,
 	usePatchAdminOrderMutation,

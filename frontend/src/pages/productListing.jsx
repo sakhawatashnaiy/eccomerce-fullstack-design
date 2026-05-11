@@ -7,21 +7,62 @@ import Footer from '../components/Footer.jsx'
 import Navbar from '../components/Navbar.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useGetProductsQuery } from '../services/apiSlice.js'
+import {
+	useAddWishlistItemMutation,
+	useGetMyWishlistQuery,
+	useGetProductsQuery,
+	useGetSellerByIdQuery,
+	useRemoveWishlistItemMutation,
+} from '../services/apiSlice.js'
+import { isSignedIn } from '../utils/authSession.js'
 
 export default function ProductListing() {
 	const [searchParams] = useSearchParams()
 	const activeCategory = searchParams.get('category')
 	const search = searchParams.get('search')
+	const sellerId = searchParams.get('sellerId')
+	const deals = searchParams.get('deals')
+	const wishlistOnly = searchParams.get('wishlist')
 
 	const queryArgs = useMemo(() => {
 		return {
 			category: activeCategory || undefined,
 			search: search || undefined,
+			sellerId: sellerId || undefined,
+			deals: deals || undefined,
 		}
-	}, [activeCategory, search])
+	}, [activeCategory, search, sellerId, deals])
 
 	const { data: visibleProducts = [], isLoading, isError } = useGetProductsQuery(queryArgs)
+	const signedIn = isSignedIn()
+	const { data: wishlistIds = [] } = useGetMyWishlistQuery(undefined, { skip: !signedIn })
+	const { data: seller } = useGetSellerByIdQuery(sellerId, { skip: !sellerId })
+	const [addWishlistItem] = useAddWishlistItemMutation()
+	const [removeWishlistItem] = useRemoveWishlistItemMutation()
+	const wishlistSet = useMemo(() => new Set(wishlistIds), [wishlistIds])
+
+	const filteredProducts = useMemo(() => {
+		if (!wishlistOnly) return visibleProducts
+		return visibleProducts.filter((product) => wishlistSet.has(product?.id))
+	}, [visibleProducts, wishlistOnly, wishlistSet])
+
+	const handleToggleWishlist = async (product) => {
+		if (!signedIn) {
+			window.alert('Please sign in to use wishlist.')
+			return
+		}
+		const id = product?.id
+		if (!id) return
+		try {
+			if (wishlistSet.has(id)) {
+				await removeWishlistItem(id).unwrap()
+			} else {
+				await addWishlistItem(id).unwrap()
+			}
+		} catch {
+			// Silent fail for now
+		}
+	}
 
 	return (
 		<div className="min-h-screen bg-white text-slate-900">
@@ -36,17 +77,30 @@ export default function ProductListing() {
 									? `${activeCategory} products`
 									: search
 										? `Search results for "${search}"`
-										: 'All products'}
+										: deals
+											? 'Flash deals'
+											: wishlistOnly
+												? 'Your wishlist'
+												: 'All products'}
 							</h1>
 							<p className="mt-2 text-sm text-slate-600">
 								{activeCategory
 									? 'Showing products from the selected category.'
 									: search
 										? 'Filtered by your search query.'
-										: 'Browse the full collection of electronics and essentials.'}
+										: deals
+											? 'Limited-time prices across the store.'
+											: wishlistOnly
+												? 'Saved items you can buy later.'
+												: 'Browse the full collection of electronics and essentials.'}
 							</p>
+							{seller ? (
+								<p className="mt-2 text-sm text-slate-600">
+									Seller: <span className="font-semibold text-slate-900">{seller.name || seller.id}</span>
+								</p>
+							) : null}
 						</div>
-						{activeCategory || search ? (
+						{activeCategory || search || deals || wishlistOnly || sellerId ? (
 							<Link to="/products" className="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-500">
 								Clear filters
 							</Link>
@@ -57,12 +111,17 @@ export default function ProductListing() {
 						<p className="mt-8 text-sm text-slate-600">Loading products...</p>
 					) : isError ? (
 						<p className="mt-8 text-sm text-rose-600">Failed to load products. Check backend connection.</p>
-					) : visibleProducts.length === 0 ? (
+					) : filteredProducts.length === 0 ? (
 						<p className="mt-8 text-sm text-slate-600">No products match your filters.</p>
 					) : (
 						<div className="mt-8 grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-							{visibleProducts.map((product) => (
-								<ProductCard key={product.id} product={product} />
+								{filteredProducts.map((product) => (
+									<ProductCard
+										key={product.id}
+										product={product}
+										wishlistIds={wishlistSet}
+										onToggleWishlist={handleToggleWishlist}
+									/>
 							))}
 						</div>
 					)}
