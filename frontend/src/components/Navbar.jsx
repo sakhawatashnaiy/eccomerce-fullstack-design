@@ -83,7 +83,7 @@ export default function Navbar() {
 						ES
 					</span> */}
 					<span className="navbar-brand-animated font-sans text-lg font-bold italic tracking-tight text-slate-950 transition-transform duration-300 hover:-translate-y-0.5 sm:text-xl">
-						My Eccomerce store
+					    Ashnaiy express
 					</span>
 				</Link>
 
