@@ -65,7 +65,7 @@ async function validateCoupon(code, subtotal) {
 	return validateCouponDoc(coupon, { subtotal })
 }
 
-async function createOrUpdateCoupon(payload = {}) {
+async function createOrUpdateCoupon(payload: Record<string, any> = {}) {
 	const { db } = getFirebaseAdmin()
 	const code = normalizeCode(payload.code)
 	if (!code) {

@@ -6,6 +6,8 @@ const { getFirebaseAdmin } = require('../../config/firebaseAdmin')
 const { isDataUriImage, uploadImageToCloudinary } = require('../../config/cloudinary')
 const { sampleProducts } = require('./sampleProducts')
 
+type AnyRecord = Record<string, any>
+
 function normalizeId(value) {
 	return String(value ?? '').trim()
 }
@@ -28,7 +30,7 @@ function normalizeStocks(value) {
 	return Math.max(0, Math.floor(Number(value ?? 0) || 0))
 }
 
-function normalizeVariantsInput(variants) {
+function normalizeVariantsInput(variants: any) {
 	if (!Array.isArray(variants)) return []
 	return variants
 		.map((v) => {
@@ -46,7 +48,19 @@ function normalizeVariantsInput(variants) {
 		.filter(Boolean)
 }
 
-function normalizeDealInput(deal) {
+function normalizeImagesInput(images: any, fallbackImage: any) {
+	const list = Array.isArray(images) ? images : []
+	const normalized = list
+		.map((value) => String(value || '').trim())
+		.filter(Boolean)
+	if (!normalized.length && fallbackImage) {
+		const fallback = String(fallbackImage || '').trim()
+		if (fallback) normalized.push(fallback)
+	}
+	return normalized
+}
+
+function normalizeDealInput(deal: AnyRecord | null) {
 	if (!deal || typeof deal !== 'object') return null
 	const price = normalizeMoney(deal.price ?? deal.dealPrice)
 	const startsAt = normalizeIsoDate(deal.startsAt)
@@ -56,7 +70,7 @@ function normalizeDealInput(deal) {
 	return { price, startsAt, endsAt, label }
 }
 
-function normalizeSellerInput(seller, payload = {}) {
+function normalizeSellerInput(seller: AnyRecord | null, payload: AnyRecord = {}) {
 	const sellerId = normalizeId(payload.sellerId || seller?.id || seller?.sellerId)
 	const sellerName = String(payload.sellerName || seller?.name || '').trim()
 	if (!sellerId && !sellerName) return { sellerId: null, seller: null }
@@ -70,7 +84,7 @@ function normalizeSellerInput(seller, payload = {}) {
 	}
 }
 
-function isDealActive(product, now = new Date()) {
+function isDealActive(product: AnyRecord, now = new Date()) {
 	const deal = product?.deal
 	if (!deal || typeof deal !== 'object') return false
 	if (!(Number(deal.price) > 0)) return false
@@ -85,7 +99,7 @@ function isDealActive(product, now = new Date()) {
 	return true
 }
 
-async function resolveProductImage(image) {
+async function resolveProductImage(image: any) {
 	const value = String(image ?? '').trim()
 	if (!value) return value
 
@@ -97,15 +111,23 @@ async function resolveProductImage(image) {
 	return value
 }
 
-function normalizeProductInput(payload = {}) {
+async function resolveProductImages(images: any) {
+	if (!Array.isArray(images) || images.length === 0) return []
+	const resolved = await Promise.all(images.map((value) => resolveProductImage(value)))
+	return resolved.map((value) => String(value || '').trim()).filter(Boolean)
+}
+
+function normalizeProductInput(payload: AnyRecord = {}) {
 	const { sellerId, seller } = normalizeSellerInput(payload.seller, payload)
 	const variants = normalizeVariantsInput(payload.variants)
 	const deal = normalizeDealInput(payload.deal)
+	const images = normalizeImagesInput(payload.images, payload.image)
 
 	return {
 		name: String(payload.name ?? '').trim(),
 		price: normalizeMoney(payload.price),
 		image: String(payload.image ?? '').trim(),
+		images,
 		description: String(payload.description ?? '').trim(),
 		category: String(payload.category ?? '').trim(),
 		stocks: normalizeStocks(payload.stocks),
@@ -123,7 +145,7 @@ function normalizeProductInput(payload = {}) {
 	}
 }
 
-async function readAllProducts(query = {}) {
+async function readAllProducts(query: AnyRecord = {}) {
 	const { db } = getFirebaseAdmin()
 	const snapshot = await db.collection('products').get()
 
@@ -161,7 +183,39 @@ async function readAllProducts(query = {}) {
 		items = items.filter((product) => isDealActive(product, now))
 	}
 
+	const priceMin = Number(query.priceMin)
+	const priceMax = Number(query.priceMax)
+	if (Number.isFinite(priceMin)) {
+		items = items.filter((product) => Number(product.price) >= priceMin)
+	}
+	if (Number.isFinite(priceMax)) {
+		items = items.filter((product) => Number(product.price) <= priceMax)
+	}
+
+	const rating = Number(query.rating)
+	if (Number.isFinite(rating) && rating > 0) {
+		items = items.filter((product) => Number(product.rating || 0) >= rating)
+	}
+
+	const brand = String(query.brand || '').trim().toLowerCase()
+	if (brand) {
+		items = items.filter((product) => String(product.brand || '').trim().toLowerCase() === brand)
+	}
+
+	const sortKey = String(query.sort || 'newest').trim().toLowerCase()
 	items.sort((a, b) => {
+		if (sortKey === 'price-asc') {
+			return Number(a.price || 0) - Number(b.price || 0)
+		}
+		if (sortKey === 'price-desc') {
+			return Number(b.price || 0) - Number(a.price || 0)
+		}
+		if (sortKey === 'rating') {
+			return Number(b.rating || 0) - Number(a.rating || 0)
+		}
+		if (sortKey === 'popularity') {
+			return Number(b.reviews || 0) - Number(a.reviews || 0)
+		}
 		const da = new Date(a.createdAt || 0).getTime() || 0
 		const dbValue = new Date(b.createdAt || 0).getTime() || 0
 		return dbValue - da
@@ -174,7 +228,7 @@ async function readAllProducts(query = {}) {
 	return items
 }
 
-async function readProductRecommendations(productId, options = {}) {
+async function readProductRecommendations(productId: any, options: AnyRecord = {}) {
 	const limit = Math.max(1, Math.min(24, Math.floor(Number(options.limit || 8) || 8)))
 	const product = await readProductById(productId)
 	const all = await readAllProducts({})
@@ -209,7 +263,7 @@ async function recalcProductRating(productId) {
 	return { rating: avg, reviews: count }
 }
 
-async function upsertProductReview(uid, productId, payload = {}) {
+async function upsertProductReview(uid: any, productId: any, payload: AnyRecord = {}) {
 	const { db } = getFirebaseAdmin()
 	const rating = Math.max(1, Math.min(5, Math.floor(Number(payload.rating) || 0)))
 	if (!rating) {
@@ -252,7 +306,9 @@ async function readProductById(id) {
 async function createProductDoc(payload) {
 	const { db } = getFirebaseAdmin()
 	const image = await resolveProductImage(payload.image)
-	const data = normalizeProductInput({ ...payload, image })
+	const resolvedImages = await resolveProductImages(payload.images)
+	const images = resolvedImages.length ? resolvedImages : normalizeImagesInput([], image)
+	const data = normalizeProductInput({ ...payload, image, images })
 
 	const docId = String(payload.id || '').trim()
 	if (docId) {
@@ -279,7 +335,12 @@ async function updateProductDoc(id, payload) {
 	const current = snapshot.data()
 	const image =
 		payload.image !== undefined ? await resolveProductImage(payload.image) : current.image
-	const merged = normalizeProductInput({ ...current, ...payload, image })
+	const resolvedImages =
+		payload.images !== undefined ? await resolveProductImages(payload.images) : current.images
+	const images = Array.isArray(resolvedImages) && resolvedImages.length
+		? resolvedImages
+		: normalizeImagesInput(current.images, image)
+	const merged = normalizeProductInput({ ...current, ...payload, image, images })
 	merged.updatedAt = new Date().toISOString()
 
 	await ref.set(merged, { merge: true })

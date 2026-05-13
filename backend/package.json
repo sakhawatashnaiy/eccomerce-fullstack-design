@@ -2,11 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend fullstack eccomerce",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "seed:products": "node src/scripts/seedProducts.js",
+    "build": "tsc -p tsconfig.json",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "seed:products": "npm run build && node dist/scripts/seedProducts.js",
     "test": "echo \"No tests configured yet\""
   },
   "dependencies": {
@@ -18,7 +19,13 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/cors": "^2.8.18",
+    "@types/express": "^4.17.23",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^20.14.10",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
   },
   "repository": {
     "type": "git",

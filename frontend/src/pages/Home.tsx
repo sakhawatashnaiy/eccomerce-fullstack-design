@@ -40,18 +40,18 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 
 	return (
 		<section className="relative overflow-hidden bg-slate-950">
-			<div className="absolute inset-0 opacity-70">
-				<div className="absolute -top-24 left-1/2 h-72 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-400 blur-3xl" />
-				<div className="absolute -bottom-24 left-1/4 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 to-lime-400 blur-3xl" />
+			<div className="absolute inset-0 opacity-80">
+				<div className="absolute -top-20 left-1/2 h-72 w-[52rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 blur-3xl" />
+				<div className="absolute -bottom-24 left-1/4 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-lime-300 blur-3xl" />
 			</div>
 
 			<div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-12 lg:px-8 lg:py-20">
 				<div className="lg:col-span-6">
-					<p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-white ring-1 ring-white/15">
+					<div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white ring-1 ring-white/20">
 						<span className="h-2 w-2 rounded-full bg-emerald-400" />
 						{slide.tag}
-					</p>
-					<h1 className="mt-5 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+					</div>
+					<h1 className="mt-5 text-balance text-4xl font-semibold italic tracking-tight text-white sm:text-5xl">
 						{slide.heading}
 					</h1>
 					<p className="mt-4 max-w-xl text-pretty text-base leading-7 text-slate-200 sm:text-lg">
@@ -62,14 +62,14 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 						{slide.cta1.to.startsWith('#') ? (
 							<a
 								href={slide.cta1.to}
-								className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
+								className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
 							>
 								{slide.cta1.label}
 							</a>
 						) : (
 							<Link
 								to={slide.cta1.to}
-								className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
+								className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 ring-1 ring-white/20 transition-colors hover:bg-slate-100"
 							>
 								{slide.cta1.label}
 							</Link>
@@ -78,18 +78,33 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 						{slide.cta2.to.startsWith('#') ? (
 							<a
 								href={slide.cta2.to}
-								className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
+								className="inline-flex items-center justify-center rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
 							>
 								{slide.cta2.label}
 							</a>
 						) : (
 							<Link
 								to={slide.cta2.to}
-								className="inline-flex items-center justify-center rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
+								className="inline-flex items-center justify-center rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/15"
 							>
 								{slide.cta2.label}
 							</Link>
 						)}
+					</div>
+
+					<div className="mt-8 grid max-w-md grid-cols-3 gap-3 text-xs text-white/80">
+						<div className="rounded-xl bg-white/10 px-3 py-2 ring-1 ring-white/15">
+							<p className="text-sm font-semibold text-white">48h</p>
+							<p className="uppercase tracking-widest">Flash drops</p>
+						</div>
+						<div className="rounded-xl bg-white/10 px-3 py-2 ring-1 ring-white/15">
+							<p className="text-sm font-semibold text-white">2k+</p>
+							<p className="uppercase tracking-widest">Daily deals</p>
+						</div>
+						<div className="rounded-xl bg-white/10 px-3 py-2 ring-1 ring-white/15">
+							<p className="text-sm font-semibold text-white">24/7</p>
+							<p className="uppercase tracking-widest">Support</p>
+						</div>
 					</div>
 
 					<div className="mt-8 flex items-center gap-2">
@@ -110,22 +125,22 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 				</div>
 
 				<div className="lg:col-span-6">
-					<div className="relative  rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 sm:p-6">
-						<div className="absolute inset-5 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+					<div className="relative overflow-hidden rounded-3xl bg-white/5 p-5 ring-1 ring-white/10 sm:p-6">
+						<div className="absolute inset-5 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-white/5" />
 						{slide.image ? (
 							<img
 								src={slide.image}
 								alt="Promotion"
-								className="relative aspect-[4/3] w-full rounded-xl object-fit ring-1 ring-white/10"
+								className="relative aspect-[4/3] w-full rounded-2xl object-cover ring-1 ring-white/10"
 								loading="lazy"
 							/>
 						) : (
-							<div className="relative aspect-[4/3] w-100 rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
+							<div className="relative aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10" />
 						)}
-						<div className="relative mt-4 flex items-center justify-between rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
-							<p className="text-sm font-semibold text-white">Trusted checkout • Fast shipping</p>
+						<div className="relative mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/5 px-4 py-3 ring-1 ring-white/10">
+							<p className="text-sm font-semibold text-white">Fast shipping • Secure checkout</p>
 							<span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white ring-1 ring-white/15">
-								Secure
+								Verified sellers
 							</span>
 						</div>
 					</div>
@@ -176,17 +191,17 @@ function isDealActive(product) {
 
 const promoSlides = [
 	{
-		tag: 'Limited time',
-		heading: 'Latest Trending Electronics Items',
-		subtitle: 'Make a faster upgrade with curated picks, clean specs, and honest pricing.',
-		cta1: { label: 'Shop now', to: '/products' },
+		tag: 'Super deals',
+		heading: 'Mega picks built for fast checkout',
+		subtitle: 'Daily price drops, verified sellers, and clean specs on the products people want now.',
+		cta1: { label: 'Shop flash deals', to: '#deals' },
 		cta2: { label: 'Browse categories', to: '#categories' },
 		image: null,
 	},
 	{
-		tag: 'New arrivals',
-		heading: 'New drops every week',
-		subtitle: 'Fresh gadgets and essentials sorted by newest first — designed to convert.',
+		tag: 'Trending now',
+		heading: 'Top-rated gadgets, ready to ship',
+		subtitle: 'Built for speed and confidence: curated products with clean pricing and fast delivery.',
 		cta1: { label: 'See new arrivals', to: '#latest' },
 		cta2: { label: 'View all products', to: '/products' },
 		image: null,
@@ -272,20 +287,21 @@ export default function Home() {
 						</div>
 
 						<div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-							{categories.map((c) => (
+							{categories.map((c, index) => (
 								<Link
 									key={c.name}
 									to={`/products?category=${encodeURIComponent(c.name)}`}
-									className="group rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300"
+									className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg"
 								>
-									<div className="flex items-start justify-between gap-4">
+									<div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 opacity-0 transition-opacity group-hover:opacity-100" />
+									<div className="relative flex items-start justify-between gap-4">
 										<div className="min-w-0">
 											<p className="truncate text-base font-semibold text-slate-900" title={c.name}>
 												{c.name}
 											</p>
 											<p className="mt-1 text-sm text-slate-600">{c.count} items</p>
 										</div>
-										<span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-200 transition-colors group-hover:bg-slate-100">
+										<span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white ring-1 ring-slate-200 transition-colors group-hover:bg-slate-50">
 											<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-slate-700" aria-hidden="true">
 												<path
 													d="M6 7h15l-1.5 8.5a2 2 0 01-2 1.5H9a2 2 0 01-2-1.6L5 4H2"
@@ -296,6 +312,10 @@ export default function Home() {
 												/>
 											</svg>
 										</span>
+									</div>
+									<div className="relative mt-6 flex items-center justify-between text-xs text-slate-500">
+										<span>Top picks</span>
+										<span className="font-semibold text-slate-900">#{index + 1}</span>
 									</div>
 								</Link>
 							))}
@@ -333,33 +353,32 @@ export default function Home() {
 					</div>
 				</section>
 
-						{flashDeals.length ? (
-							<section id="deals" className="bg-white">
-								<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-									<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-										<div>
-											<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Flash deals</h2>
-											<p className="mt-2 text-sm text-slate-600">Limited-time prices while stock lasts.</p>
-										</div>
-										<Link to="/products?deals=true" className="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-500">
-											View all deals
-										</Link>
-									</div>
-									<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-										{flashDeals.map((product) => (
-											<ProductCard
-												key={product.id}
-												product={product}
-												wishlistIds={wishlistSet}
-												onToggleWishlist={handleToggleWishlist}
-											/>
-										))}
-									</div>
+				{flashDeals.length ? (
+					<section id="deals" className="bg-white">
+						<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+							<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+								<div>
+									<h2 className="text-2xl font-semibold tracking-tight text-slate-900">Flash deals</h2>
+									<p className="mt-2 text-sm text-slate-600">Limited-time prices while stock lasts.</p>
 								</div>
-							</section>
-						) : null}
+								<Link to="/products?deals=true" className="text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-500">
+									View all deals
+								</Link>
+							</div>
+							<div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								{flashDeals.map((product) => (
+									<ProductCard
+										key={product.id}
+										product={product}
+										wishlistIds={wishlistSet}
+										onToggleWishlist={handleToggleWishlist}
+									/>
+								))}
+							</div>
+						</div>
+					</section>
+				) : null}
 
-				{/* Latest / new arrivals (createdAt DESC) */}
 				<section id="latest" className="bg-white">
 					<div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

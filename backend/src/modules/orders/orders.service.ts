@@ -209,7 +209,7 @@ async function updateOrderById(orderId, patch) {
 	}
 
 	const current = doc.data() || {}
-	const next = {}
+	const next: Record<string, any> = {}
 
 	// Status transitions
 	if (Object.prototype.hasOwnProperty.call(patch || {}, 'status')) {

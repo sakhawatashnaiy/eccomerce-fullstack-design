@@ -38,7 +38,7 @@ function isDataUriImage(value = '') {
 	return /^data:image\/[a-zA-Z0-9.+-]+;base64,/.test(String(value).trim())
 }
 
-function withTimeout(promise, timeoutMs, label) {
+function withTimeout(promise: Promise<any>, timeoutMs: number, label: string) {
 	const ms = Number(timeoutMs) > 0 ? Number(timeoutMs) : DEFAULT_UPLOAD_TIMEOUT_MS
 	return Promise.race([
 		promise,
@@ -52,7 +52,7 @@ function withTimeout(promise, timeoutMs, label) {
 	])
 }
 
-function assertUploadableImageString(value) {
+function assertUploadableImageString(value: string) {
 	const text = String(value || '').trim()
 	if (!text) return
 
@@ -63,7 +63,10 @@ function assertUploadableImageString(value) {
 	}
 }
 
-async function uploadImageToCloudinary(file, options = {}) {
+async function uploadImageToCloudinary(
+	file: string,
+	options: { folder?: string; timeoutMs?: number } = {}
+) {
 	ensureCloudinaryConfig()
 	assertUploadableImageString(file)
 
