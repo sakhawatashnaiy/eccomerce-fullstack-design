@@ -3,13 +3,22 @@
  * Expects `Authorization: Bearer <idToken>` and attaches decoded user to `req.user`.
  */
 
-const { getFirebaseAdmin } = require('../config/firebaseAdmin')
+import { Request, Response, NextFunction } from 'express'
+import { getFirebaseAdmin } from '../config/firebaseAdmin'
 
-async function authGuard(req, _res, next) {
+interface CustomError extends Error {
+	status?: number
+}
+
+interface AuthenticatedRequest extends Request {
+	user?: any
+}
+
+async function authGuard(req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> {
 	try {
 		const authHeader = req.headers.authorization || ''
 		if (!authHeader.startsWith('Bearer ')) {
-			const error = new Error('Missing or invalid authorization token')
+			const error: CustomError = new Error('Missing or invalid authorization token')
 			error.status = 401
 			throw error
 		}
@@ -19,10 +28,10 @@ async function authGuard(req, _res, next) {
 		const decoded = await auth.verifyIdToken(token)
 		req.user = decoded
 		next()
-	} catch (error) {
+	} catch (error: any) {
 		error.status = error.status || 401
 		next(error)
 	}
 }
 
-module.exports = { authGuard }
+export { authGuard }

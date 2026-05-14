@@ -10,21 +10,32 @@
  * - Firestore user profile: `role` (string)
  */
 
-const { env } = require('../config/env')
-const { findOrCreateUserProfile } = require('../modules/auth/auth.service')
+import { Request, Response, NextFunction } from 'express'
+import { env } from '../config/env'
+import { findOrCreateUserProfile } from '../modules/auth/auth.service'
 
-function normalizeRole(value) {
+interface CustomError extends Error {
+	status?: number
+}
+
+interface AuthenticatedRequest extends Request {
+	user?: any
+	userProfile?: any
+	params: Record<string, string>
+}
+
+function normalizeRole(value: any): string {
 	return String(value || '').trim().toLowerCase()
 }
 
-function parseCsv(value) {
+function parseCsv(value: string): string[] {
 	return String(value || '')
 		.split(',')
 		.map((s) => s.trim())
 		.filter(Boolean)
 }
 
-function isAllowlisted({ uid, email }) {
+function isAllowlisted({ uid, email }: { uid?: string; email?: string }): boolean {
 	const allowedUids = new Set(parseCsv(env.adminUids))
 	const allowedEmails = new Set(parseCsv(env.adminEmails).map((e) => e.toLowerCase()))
 
@@ -33,13 +44,13 @@ function isAllowlisted({ uid, email }) {
 	return false
 }
 
-function addRole(roleSet, role) {
+function addRole(roleSet: Set<string>, role: any): void {
 	const normalized = normalizeRole(role)
 	if (normalized) roleSet.add(normalized)
 }
 
-function getRolesFromDecoded(decoded) {
-	const roles = new Set()
+function getRolesFromDecoded(decoded: any): Set<string> {
+	const roles = new Set<string>()
 
 	if (decoded?.admin === true) roles.add('admin')
 	if (isAllowlisted({ uid: decoded?.uid, email: decoded?.email })) roles.add('admin')
@@ -52,21 +63,21 @@ function getRolesFromDecoded(decoded) {
 	return roles
 }
 
-function hasAnyRole(roleSet, allowedRoles) {
+function hasAnyRole(roleSet: Set<string>, allowedRoles: string[]): boolean {
 	for (const r of allowedRoles) {
 		if (roleSet.has(normalizeRole(r))) return true
 	}
 	return false
 }
 
-function requireRoles(roles = []) {
+function requireRoles(roles: string[] | string = []): (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void> {
 	const allowed = Array.isArray(roles) ? roles : [roles]
 
-	return async function roleGuard(req, _res, next) {
+	return async function roleGuard(req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> {
 		try {
 			const decoded = req.user
 			if (!decoded?.uid) {
-				const error = new Error('Unauthorized')
+				const error: CustomError = new Error('Unauthorized')
 				error.status = 401
 				throw error
 			}
@@ -83,24 +94,29 @@ function requireRoles(roles = []) {
 
 			if (hasAnyRole(roleSet, allowed)) return next()
 
-			const error = new Error('Forbidden')
+			const error: CustomError = new Error('Forbidden')
 			error.status = 403
 			throw error
-		} catch (error) {
+		} catch (error: any) {
 			error.status = error.status || 403
 			next(error)
 		}
 	}
 }
 
-function requireSelfOrRoles({ param = 'uid', roles = ['admin'] } = {}) {
+interface SelfOrRolesOptions {
+	param?: string
+	roles?: string[] | string
+}
+
+function requireSelfOrRoles({ param = 'uid', roles = ['admin'] }: SelfOrRolesOptions = {}): (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void> {
 	const allowed = Array.isArray(roles) ? roles : [roles]
 	const requireOther = requireRoles(allowed)
 
-	return async function selfOrRolesGuard(req, res, next) {
+	return async function selfOrRolesGuard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
 		const decoded = req.user
 		if (!decoded?.uid) {
-			const error = new Error('Unauthorized')
+			const error: CustomError = new Error('Unauthorized')
 			error.status = 401
 			return next(error)
 		}
@@ -110,4 +126,4 @@ function requireSelfOrRoles({ param = 'uid', roles = ['admin'] } = {}) {
 	}
 }
 
-module.exports = { requireRoles, requireSelfOrRoles }
+export { requireRoles, requireSelfOrRoles }

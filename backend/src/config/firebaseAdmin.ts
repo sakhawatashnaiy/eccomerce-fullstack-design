@@ -3,15 +3,22 @@
  * Reads service account JSON from environment and exposes reusable instances.
  */
 
-const admin = require('firebase-admin')
-const { env } = require('./env')
+import admin from 'firebase-admin'
+import { env } from './env'
 
-let app
+let app: admin.app.App | undefined
 
-function parseServiceAccountFromEnv() {
+interface ServiceAccount {
+	project_id: string
+	client_email: string
+	private_key: string
+	private_key_id?: string
+}
+
+function parseServiceAccountFromEnv(): ServiceAccount {
 	if (env.firebaseServiceAccount) {
 		try {
-			return JSON.parse(env.firebaseServiceAccount)
+			return JSON.parse(env.firebaseServiceAccount) as ServiceAccount
 		} catch (_error) {
 			throw new Error(
 				'FIREBASE_SERVICE_ACCOUNT must be valid JSON. If using multiline private_key, escape newlines as \\n or use split vars FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY.'
@@ -33,7 +40,14 @@ function parseServiceAccountFromEnv() {
 	)
 }
 
-function getFirebaseAdmin() {
+interface FirebaseServices {
+	admin: typeof admin
+	app: admin.app.App
+	auth: admin.auth.Auth
+	db: admin.firestore.Firestore
+}
+
+function getFirebaseAdmin(): FirebaseServices {
 	if (app) return { admin, app, auth: admin.auth(), db: admin.firestore() }
 
 	const serviceAccount = parseServiceAccountFromEnv()
@@ -47,4 +61,4 @@ function getFirebaseAdmin() {
 	return { admin, app, auth: admin.auth(), db: admin.firestore() }
 }
 
-module.exports = { getFirebaseAdmin }
+export { getFirebaseAdmin }

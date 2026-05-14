@@ -2,9 +2,14 @@
  * Global error middleware.
  */
 
-const { env } = require('../config/env')
+import { Request, Response, NextFunction } from 'express'
+import { env } from '../config/env'
 
-function errorHandler(err, _req, res, _next) {
+interface CustomError extends Error {
+	status?: number
+}
+
+function errorHandler(err: CustomError, _req: Request, res: Response, _next: NextFunction): void {
 	const status = Number(err.status || 500)
 	const message = err.message || 'Internal server error'
 
@@ -15,4 +20,4 @@ function errorHandler(err, _req, res, _next) {
 	})
 }
 
-module.exports = { errorHandler }
+export { errorHandler }

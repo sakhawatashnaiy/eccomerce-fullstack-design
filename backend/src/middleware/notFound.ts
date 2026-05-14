@@ -2,8 +2,10 @@
  * 404 middleware for unknown routes.
  */
 
-function notFound(req, res) {
+import { Request, Response } from 'express'
+
+function notFound(req: Request, res: Response): void {
 	res.status(404).json({ ok: false, message: `Route not found: ${req.method} ${req.originalUrl}` })
 }
 
-module.exports = { notFound }
+export { notFound }
