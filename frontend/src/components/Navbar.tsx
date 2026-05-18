@@ -35,6 +35,7 @@ function isAdminAllowed() {
 export default function Navbar() {
 	const navigate = useNavigate()
 	const [isOpen, setIsOpen] = useState(false)
+	const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false)
 	const [cartCount, setCartCount] = useState(() => getCartCount())
 	const [searchText, setSearchText] = useState('')
 	const [signedIn, setSignedIn] = useState(() => isSignedIn())
@@ -293,7 +294,15 @@ export default function Navbar() {
 						className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 transition-colors duration-200 hover:bg-slate-100 md:hidden"
 						aria-label={isOpen ? 'Close menu' : 'Open menu'}
 						aria-expanded={isOpen}
-						onClick={() => setIsOpen((v) => !v)}
+						onClick={() =>
+							setIsOpen((v) => {
+								const next = !v
+								if (!next) {
+									setIsMobileCategoriesOpen(false)
+								}
+								return next
+							})
+						}
 					>
 						<svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden="true">
 							{isOpen ? (
@@ -344,24 +353,62 @@ export default function Navbar() {
 							>
 								Wishlist
 							</Link>
-							<Link
-								to="/category"
-								className="rounded-lg px-3 py-2 hover:bg-slate-100 whitespace-nowrap"
-								onClick={() => setIsOpen(false)}
-							>
-								Category
-							</Link>
-							<div className="pl-3">
-								{categories.map((category) => (
-									<Link
-										key={category.label}
-										to={category.href}
-										className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
-										onClick={() => setIsOpen(false)}
+							<div className="rounded-lg border border-slate-200">
+								<button
+									type="button"
+									className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left font-semibold text-slate-800 hover:bg-slate-100"
+									aria-expanded={isMobileCategoriesOpen}
+									aria-controls="mobile-category-list"
+									onClick={() => setIsMobileCategoriesOpen((v) => !v)}
+								>
+									<span>Category</span>
+									<svg
+										viewBox="0 0 20 20"
+										className={`h-4 w-4 transition-transform ${isMobileCategoriesOpen ? 'rotate-180' : ''}`}
+										aria-hidden="true"
 									>
-										{category.label}
-									</Link>
-								))}
+										<path
+											d="M5 7l5 6 5-6"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.6"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
+								</button>
+								<div
+									id="mobile-category-list"
+									className={`overflow-hidden border-t border-slate-200 transition-all duration-300 ${
+										isMobileCategoriesOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+									}`}
+								>
+									<div className="px-3 py-2">
+										{categories.map((category) => (
+											<Link
+												key={category.label}
+												to={category.href}
+												className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+												onClick={() => {
+													setIsOpen(false)
+													setIsMobileCategoriesOpen(false)
+												}}
+											>
+												{category.label}
+											</Link>
+										))}
+										<Link
+											to="/category"
+											className="mt-1 block rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+											onClick={() => {
+												setIsOpen(false)
+												setIsMobileCategoriesOpen(false)
+											}}
+										>
+											All categories
+										</Link>
+									</div>
+								</div>
 							</div>
 							<Link
 								to="/new-arrivals"
