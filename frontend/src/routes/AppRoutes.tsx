@@ -12,6 +12,9 @@ import ProtectedRoute from './ProtectedRoute.jsx'
 const Home = lazy(() => import('../pages/Home.jsx'))
 const ProductListing = lazy(() => import('../pages/productListing.jsx'))
 const ProductDetails = lazy(() => import('../pages/productDetails.jsx'))
+const Category = lazy(() => import('../pages/category.jsx'))
+const NewArrivals = lazy(() => import('../pages/newArrivals.jsx'))
+const Wishlist = lazy(() => import('../pages/wishlist.jsx'))
 const Cart = lazy(() => import('../pages/Cart.jsx'))
 const Checkout = lazy(() => import('../pages/checkout.jsx'))
 const AdminProducts = lazy(() => import('../admin/pages/AdminProducts.jsx'))
@@ -43,6 +46,9 @@ export default function AppRoutes() {
 				<Route path="/" element={wrap(withSuspense(<Home />))} />
 				<Route path="/products" element={wrap(withSuspense(<ProductListing />))} />
 				<Route path="/product/:id" element={wrap(withSuspense(<ProductDetails />))} />
+				<Route path="/category" element={wrap(withSuspense(<Category />))} />
+				<Route path="/new-arrivals" element={wrap(withSuspense(<NewArrivals />))} />
+				<Route path="/wishlist" element={wrap(withSuspense(<Wishlist />))} />
 				<Route path="/cart" element={wrap(withSuspense(<Cart />))} />
 				<Route
 					path="/checkout"

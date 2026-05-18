@@ -39,6 +39,13 @@ export default function Navbar() {
 	const [searchText, setSearchText] = useState('')
 	const [signedIn, setSignedIn] = useState(() => isSignedIn())
 	const [canSeeAdmin, setCanSeeAdmin] = useState(() => (isSignedIn() ? isAdminAllowed() : false))
+	const categories = [
+		{ label: 'Electronics', href: '/products?category=electronics' },
+		{ label: 'Fashion', href: '/products?category=fashion' },
+		{ label: 'Home & Living', href: '/products?category=home' },
+		{ label: 'Beauty', href: '/products?category=beauty' },
+		{ label: 'Sports', href: '/products?category=sports' }
+	]
 
 	const submitSearch = useCallback(
 		(text) => {
@@ -89,11 +96,47 @@ export default function Navbar() {
 
 				<div className="hidden flex-1 items-center gap-3 md:flex">
 					<nav className="flex items-center gap-6 text-sm font-medium text-slate-700">
-						<Link to="/about" className="rounded-lg px-2 py-1 transition-colors hover:text-slate-900 whitespace-nowrap">
-							About
+						<Link to="/wishlist" className="rounded-lg px-2 py-1 transition-colors hover:text-slate-900 whitespace-nowrap">
+							Wishlist
 						</Link>
-						<Link to="/giftcards" className="rounded-lg px-2 py-1 transition-colors hover:text-slate-900 whitespace-nowrap">
-							Gift cards
+						<div className="relative group">
+							<button
+								type="button"
+								className="inline-flex items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:text-slate-900 whitespace-nowrap"
+								aria-haspopup="true"
+							>
+								<span>Category</span>
+								<svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
+									<path
+										d="M5 7l5 6 5-6"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="1.6"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</button>
+							<div className="invisible absolute left-0 top-full z-20 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg opacity-0 transition group-hover:visible group-hover:opacity-100">
+								{categories.map((category) => (
+									<Link
+											key={category.label}
+											to={category.href}
+											className="flex items-center rounded-lg px-3 py-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+										>
+											{category.label}
+										</Link>
+									))}
+								<Link
+										to="/category"
+										className="mt-1 flex items-center rounded-lg px-3 py-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
+									>
+										All categories
+									</Link>
+							</div>
+						</div>
+						<Link to="/new-arrivals" className="rounded-lg px-2 py-1 transition-colors hover:text-slate-900 whitespace-nowrap">
+							New arrivals
 						</Link>
 					</nav>
 					<div className="ml-auto w-full min-w-0 max-w-xs pr-5 sm:max-w-sm sm:pl-4 lg:max-w-md">
@@ -138,9 +181,9 @@ export default function Navbar() {
 							</Link>
 						) : null}
 						<Link
-							to="/orders"
+							to="/contact"
 							className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100"
-							aria-label="Orders"
+							aria-label="Contact"
 						>
 							<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
 								<path
@@ -162,11 +205,11 @@ export default function Navbar() {
 									strokeLinecap="round"
 								/>
 							</svg>
-							<span>Orders</span>
+							<span>Contact</span>
 						</Link>
 						{signedIn ? (
 							<Link
-								to="/products?wishlist=true"
+								to="/wishlist"
 								className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100"
 								aria-label="Wishlist"
 							>
@@ -313,21 +356,40 @@ export default function Navbar() {
 								</Link>
 							) : null}
 							<Link
-								to="/about"
+								to="/wishlist"
 								className="rounded-lg px-3 py-2 hover:bg-slate-100 whitespace-nowrap"
 								onClick={() => setIsOpen(false)}
 							>
-								About
+								Wishlist
 							</Link>
 							<Link
-								to="/giftcards"
+								to="/category"
 								className="rounded-lg px-3 py-2 hover:bg-slate-100 whitespace-nowrap"
 								onClick={() => setIsOpen(false)}
 							>
-								Gift cards
+								Category
+							</Link>
+							<div className="pl-3">
+								{categories.map((category) => (
+									<Link
+										key={category.label}
+										to={category.href}
+										className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+										onClick={() => setIsOpen(false)}
+									>
+										{category.label}
+									</Link>
+								))}
+							</div>
+							<Link
+								to="/new-arrivals"
+								className="rounded-lg px-3 py-2 hover:bg-slate-100 whitespace-nowrap"
+								onClick={() => setIsOpen(false)}
+							>
+								New arrivals
 							</Link>
 							<Link
-								to="/orders"
+								to="/contact"
 								className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-slate-100"
 								onClick={() => setIsOpen(false)}
 							>
@@ -351,11 +413,11 @@ export default function Navbar() {
 										strokeLinecap="round"
 									/>
 								</svg>
-								Orders
+								Contact
 							</Link>
 							{signedIn ? (
 								<Link
-									to="/products?wishlist=true"
+									to="/wishlist"
 									className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-slate-100"
 									onClick={() => setIsOpen(false)}
 								>
