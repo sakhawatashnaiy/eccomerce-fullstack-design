@@ -207,24 +207,6 @@ export default function Navbar() {
 							</svg>
 							<span>Contact</span>
 						</Link>
-						{signedIn ? (
-							<Link
-								to="/wishlist"
-								className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-slate-100"
-								aria-label="Wishlist"
-							>
-								<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
-									<path
-										d="M12 21l-1.5-1.3C6 15.7 3 12.9 3 9.7 3 7.5 4.8 5.8 7 5.8c1.4 0 2.8.7 3.6 1.9C11.2 6.5 12.6 5.8 14 5.8c2.2 0 4 1.7 4 3.9 0 3.2-3 6-7.5 10L12 21z"
-										stroke="currentColor"
-										strokeWidth="1.8"
-										strokeLinejoin="round"
-										strokeLinecap="round"
-									/>
-								</svg>
-								<span>Wishlist</span>
-							</Link>
-						) : null}
 					</div>
 
 					{signedIn ? (
@@ -415,24 +397,6 @@ export default function Navbar() {
 								</svg>
 								Contact
 							</Link>
-							{signedIn ? (
-								<Link
-									to="/wishlist"
-									className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-slate-100"
-									onClick={() => setIsOpen(false)}
-								>
-									<svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-slate-700" aria-hidden="true">
-										<path
-											d="M12 21l-1.5-1.3C6 15.7 3 12.9 3 9.7 3 7.5 4.8 5.8 7 5.8c1.4 0 2.8.7 3.6 1.9C11.2 6.5 12.6 5.8 14 5.8c2.2 0 4 1.7 4 3.9 0 3.2-3 6-7.5 10L12 21z"
-										stroke="currentColor"
-										strokeWidth="1.8"
-										strokeLinejoin="round"
-										strokeLinecap="round"
-									/>
-									</svg>
-									Wishlist
-								</Link>
-							) : null}
 							{signedIn ? (
 								<Link
 									to="/logout"
