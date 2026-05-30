@@ -304,13 +304,13 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 					/>
 				) : null}
 				<aside
-					className={cx(
-						'fixed inset-y-0 left-0 z-40 flex h-full flex-col gap-6 overflow-y-auto border-r border-[color:var(--ring)] bg-[linear-gradient(180deg,rgba(255,122,69,0.12),transparent_40%)] px-4 py-6 transition-transform duration-300 md:static md:translate-x-0',
-						mobileOpen ? 'translate-x-0' : '-translate-x-full',
-						collapsed ? 'md:w-20' : 'md:w-64',
-						'w-64'
-					)}
-				>
+	className={cx(
+		'fixed inset-y-0 left-0 z-40 flex h-full flex-col gap-6 overflow-y-auto border-r border-[color:var(--ring)] bg-[color:var(--surface)] px-4 py-6 transition-transform duration-300 md:static md:translate-x-0',
+		mobileOpen ? 'translate-x-0' : '-translate-x-full',
+		collapsed ? 'md:w-20' : 'md:w-64',
+		'w-64'
+	)}
+>
 					<div className="flex items-center justify-between">
 						<Link to="/" className="flex items-center gap-3 text-sm font-semibold">
 							<span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--primary)] text-white shadow-[0_12px_24px_rgba(255,90,31,0.35)]">
