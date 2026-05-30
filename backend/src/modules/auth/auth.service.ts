@@ -25,5 +25,4 @@ async function findOrCreateUserProfile(decodedUser) {
 
 	return snapshot.data()
 }
-
-module.exports = { findOrCreateUserProfile }
+export { findOrCreateUserProfile }

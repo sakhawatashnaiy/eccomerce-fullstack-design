@@ -128,7 +128,7 @@ function SidebarGroup({ label, icon, items, collapsed, isOpen, isActive, onToggl
 						? 'bg-[color:var(--primary-soft)] text-[color:var(--primary)]'
 						: 'text-muted hover:bg-[color:var(--surface-strong)] hover:text-[color:var(--text)]'
 				)}
-				aria-expanded={Boolean(isOpen)}
+				aria-label={label}
 			>
 				<span className="flex min-w-0 items-center gap-3">
 					{hasIcon ? <Icon className="h-5 w-5" aria-hidden="true" /> : null}
@@ -334,6 +334,7 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 						<button
 							type="button"
 							onClick={() => setMobileOpen(false)}
+							aria-label="Close menu"
 							className="inline-flex rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-2 py-2 text-xs font-semibold text-muted hover:bg-[color:var(--surface-strong)] md:hidden"
 						>
 							<X className="h-4 w-4" aria-hidden="true" />

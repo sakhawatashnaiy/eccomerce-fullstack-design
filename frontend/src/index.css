@@ -74,6 +74,30 @@
 	.text-muted {
 		color: var(--text-muted);
 	}
+
+	.admin-progress {
+		width: 100%;
+		height: 0.5rem;
+		border-radius: 9999px;
+		overflow: hidden;
+		appearance: none;
+		background: var(--ring);
+	}
+
+	.admin-progress::-webkit-progress-bar {
+		background: var(--ring);
+		border-radius: 9999px;
+	}
+
+	.admin-progress::-webkit-progress-value {
+		background: var(--primary);
+		border-radius: 9999px;
+	}
+
+	.admin-progress::-moz-progress-bar {
+		background: var(--primary);
+		border-radius: 9999px;
+	}
 }
 
 @layer utilities {

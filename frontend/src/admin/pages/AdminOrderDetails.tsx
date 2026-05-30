@@ -540,17 +540,19 @@ export default function AdminOrderDetails() {
 													className="rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface-strong)] p-4"
 												>
 													<div className="flex items-center justify-between">
-														<span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
-															alert.tone === 'rose'
+														<span
+															className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
+																alert.tone === 'rose'
 																	? 'bg-rose-50 text-rose-700 ring-rose-200'
 																	: alert.tone === 'amber'
 																		? 'bg-amber-50 text-amber-700 ring-amber-200'
 																		: alert.tone === 'indigo'
 																			? 'bg-indigo-50 text-indigo-700 ring-indigo-200'
 																			: 'bg-[color:var(--surface)] text-[color:var(--text)] ring-[color:var(--ring)]'
-														}}>
-															{alert.label}
-														</span>
+															}}`}
+													>
+														{alert.label}
+													</span>
 														<span className="text-xs text-muted">Now</span>
 													</div>
 													<p className="mt-2 text-sm text-muted">{alert.detail}</p>

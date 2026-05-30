@@ -140,7 +140,7 @@ export default function AdminDashboard() {
 	const reduceMotion = useReducedMotion()
 	const MotionDiv = motion.div
 	const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({})
-	const { data: orders = [], isLoading: isOrdersLoading } = useGetAdminOrdersQuery()
+	const { data: orders = [], isLoading: isOrdersLoading } = useGetAdminOrdersQuery(undefined)
 
 	const [search, setSearch] = useState('')
 	const [sortKey, setSortKey] = useState('stocks')
@@ -281,12 +281,9 @@ export default function AdminDashboard() {
 							{GEO_CELLS.map((cell) => (
 								<div key={cell.region} className="rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface-strong)] p-3 sm:p-4">
 									<p className="text-xs font-semibold text-muted">{cell.region}</p>
-									<div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[color:var(--ring)]">
-										<div
-											style={{ width: `${cell.value}%` }}
-											className="h-full rounded-full bg-[color:var(--primary)]"
-										/>
-									</div>
+										<div className="mt-2">
+											<progress className="admin-progress" value={cell.value} max={100} />
+										</div>
 									<p className="mt-2 text-sm font-semibold text-[color:var(--text)]">{cell.value}%</p>
 								</div>
 							))}

@@ -1,0 +1,72 @@
+"use strict";
+/**
+ * Products controller.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+const { readAllProducts, readProductById, createProductDoc, updateProductDoc, deleteProductDoc, seedProductCollection, readProductRecommendations, readProductReviews, upsertProductReview, } = require('./products.service');
+async function listProducts(req, res) {
+    const data = await readAllProducts(req.query);
+    res.status(200).json({ ok: true, data });
+}
+async function getProductById(req, res) {
+    const data = await readProductById(req.params.id);
+    res.status(200).json({ ok: true, data });
+}
+function validatePayload(payload, { partial = false } = {}) {
+    const required = ['name', 'price', 'image', 'description', 'category', 'stocks'];
+    if (!partial) {
+        for (const key of required) {
+            if (payload?.[key] === undefined || payload?.[key] === null || payload?.[key] === '') {
+                const error = new Error(`${key} is required`);
+                error.status = 400;
+                throw error;
+            }
+        }
+    }
+}
+async function createProduct(req, res) {
+    validatePayload(req.body);
+    const data = await createProductDoc(req.body);
+    res.status(201).json({ ok: true, data });
+}
+async function updateProduct(req, res) {
+    validatePayload(req.body, { partial: true });
+    const data = await updateProductDoc(req.params.id, req.body);
+    res.status(200).json({ ok: true, data });
+}
+async function deleteProduct(req, res) {
+    const data = await deleteProductDoc(req.params.id);
+    res.status(200).json({ ok: true, data });
+}
+async function seedProducts(_req, res) {
+    const data = await seedProductCollection();
+    res.status(200).json({ ok: true, data });
+}
+async function listProductRecommendations(req, res) {
+    const data = await readProductRecommendations(req.params.id, { limit: req.query.limit });
+    res.status(200).json({ ok: true, data });
+}
+async function listProductReviews(req, res) {
+    const data = await readProductReviews(req.params.id);
+    res.status(200).json({ ok: true, data });
+}
+async function createOrUpdateMyReview(req, res) {
+    const payload = {
+        ...req.body,
+        displayName: req.user?.name || req.user?.email || null,
+    };
+    const data = await upsertProductReview(req.user.uid, req.params.id, payload);
+    res.status(201).json({ ok: true, data });
+}
+module.exports = {
+    listProducts,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    seedProducts,
+    listProductRecommendations,
+    listProductReviews,
+    createOrUpdateMyReview,
+};
+//# sourceMappingURL=products.controller.js.map

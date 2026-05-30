@@ -332,7 +332,7 @@ async function updateProductDoc(id, payload) {
 		throw error
 	}
 
-	const current = snapshot.data()
+	const current: any = snapshot.data() || {}
 	const image =
 		payload.image !== undefined ? await resolveProductImage(payload.image) : current.image
 	const resolvedImages =
@@ -340,7 +340,7 @@ async function updateProductDoc(id, payload) {
 	const images = Array.isArray(resolvedImages) && resolvedImages.length
 		? resolvedImages
 		: normalizeImagesInput(current.images, image)
-	const merged = normalizeProductInput({ ...current, ...payload, image, images })
+	const merged: any = normalizeProductInput({ ...current, ...payload, image, images })
 	merged.updatedAt = new Date().toISOString()
 
 	await ref.set(merged, { merge: true })

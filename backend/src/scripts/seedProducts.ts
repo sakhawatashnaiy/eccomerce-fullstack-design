@@ -13,7 +13,8 @@ async function run() {
 		console.log(`Seed complete: ${result.inserted} products inserted/updated.`)
 		process.exit(0)
 	} catch (error) {
-		console.error('Seed failed:', error.message)
+		const message = error instanceof Error ? error.message : String(error)
+		console.error('Seed failed:', message)
 		process.exit(1)
 	}
 }

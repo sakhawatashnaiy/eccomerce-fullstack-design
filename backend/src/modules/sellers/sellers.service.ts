@@ -25,7 +25,7 @@ async function readSellerById(id) {
 	return { id: doc.id, ...doc.data() }
 }
 
-async function upsertSeller(payload = {}) {
+async function upsertSeller(payload: any = {}) {
 	const { db } = getFirebaseAdmin()
 	const sellerId = normalizeSellerId(payload.id || payload.sellerId)
 	if (!sellerId) {

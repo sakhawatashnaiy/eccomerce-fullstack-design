@@ -54,7 +54,7 @@ function getFirebaseAdmin(): FirebaseServices {
 
 	app = admin.apps.length
 		? admin.app()
-		: admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
+		: admin.initializeApp({ credential: admin.credential.cert(serviceAccount as admin.ServiceAccount) })
 
 	console.log('✅ Firebase connected successfully')
 
