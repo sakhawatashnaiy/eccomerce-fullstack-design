@@ -305,21 +305,21 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 				) : null}
 				<aside
 					className={cx(
-						'fixed inset-y-0 left-0 z-40 flex h-full flex-col gap-6 overflow-y-auto border-r border-[color:var(--ring)] bg-[color:var(--bg-elevated)] px-4 py-6 transition-transform duration-300 md:static md:translate-x-0',
+						'fixed inset-y-0 left-0 z-40 flex h-full flex-col gap-6 overflow-y-auto border-r border-[color:var(--ring)] bg-[linear-gradient(180deg,rgba(255,122,69,0.12),transparent_40%)] px-4 py-6 transition-transform duration-300 md:static md:translate-x-0',
 						mobileOpen ? 'translate-x-0' : '-translate-x-full',
 						collapsed ? 'md:w-20' : 'md:w-64',
 						'w-64'
 					)}
 				>
 					<div className="flex items-center justify-between">
-						<Link to="/" className="flex items-center gap-2 text-sm font-semibold">
-							<span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--primary)] text-white">
+						<Link to="/" className="flex items-center gap-3 text-sm font-semibold">
+							<span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--primary)] text-white shadow-[0_12px_24px_rgba(255,90,31,0.35)]">
 								EC
 							</span>
 							{collapsed ? null : (
 								<span className="leading-tight">
-									<span className="block">Enterprise Command</span>
-									<span className="mt-0.5 block text-xs font-semibold text-muted">Admin console</span>
+									<span className="block">AliExpress Command</span>
+									<span className="mt-0.5 block text-xs font-semibold text-muted">Seller operations hub</span>
 								</span>
 							)}
 						</Link>
@@ -385,7 +385,7 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 						})}
 					</nav>
 
-					<div className={cx('rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface)]', collapsed ? 'p-3' : 'p-4')}>
+					<div className={cx('rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface)] shadow-[0_16px_30px_rgba(255,122,69,0.12)]', collapsed ? 'p-3' : 'p-4')}>
 						<div className="flex items-center gap-3">
 							<div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--surface-strong)] text-sm font-semibold text-[color:var(--text)]">
 								{pickInitial(authUser?.displayName || authUser?.email)}
@@ -417,8 +417,12 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 					<header className="glass-panel sticky top-0 z-30 mx-4 mt-4 rounded-[var(--radius)] px-4 py-4 sm:mx-6 sm:mt-6 sm:px-6">
 						<div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 							<div>
-								<h1 className="text-xl font-bold uppercase tracking-widest text-slate-900">Admin Dashboard</h1>
-								<nav className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+								<div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--ring)] bg-[color:var(--surface)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-muted">
+									Live Ops
+									<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+								</div>
+								<h1 className="mt-3 text-2xl font-bold tracking-wide text-[color:var(--text)]">Admin Dashboard</h1>
+								<nav className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
 									{breadcrumbTrail.map((crumb, index) => (
 										<span key={crumb.to} className="flex items-center gap-2">
 											<Link className="hover:text-[color:var(--text)]" to={crumb.to}>

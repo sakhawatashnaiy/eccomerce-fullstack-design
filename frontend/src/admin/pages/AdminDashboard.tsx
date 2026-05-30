@@ -54,6 +54,27 @@ const CUSTOMER_SEGMENTS = [
 	{ label: 'At-Risk', value: 1890, ltv: '$220', trend: '-4.2%' },
 ]
 
+const DASHBOARD_ACTIONS = [
+	{ label: 'Create promo', helper: 'Flash sale setup', icon: BadgeCheck },
+	{ label: 'Inbound shipments', helper: 'Track supplier ETA', icon: Truck },
+	{ label: 'Replenish stock', helper: 'Auto-buy suggestions', icon: Boxes },
+]
+
+const PERFORMANCE_STRIP = [
+	{ label: 'Conversion rate', value: '3.6%', delta: '+0.4%' },
+	{ label: 'AOV', value: '$68.10', delta: '+2.1%' },
+	{ label: 'Refund rate', value: '0.9%', delta: '-0.2%' },
+	{ label: 'Live chats', value: '182', delta: '+12%' },
+]
+
+const LIVE_PULSE = [
+	{ label: 'Flash sale spike', detail: 'Wireless audio +42% in 30m' },
+	{ label: 'Hot region', detail: 'SEA delivery SLA 98.4%' },
+	{ label: 'Stock alert', detail: 'Accessories under 5 units' },
+	{ label: 'Return watch', detail: 'Footwear returns down 1.1%' },
+	{ label: 'Cart trend', detail: 'Mobile carts +18% today' },
+]
+
 function formatMoney(value) {
 	const n = Number(value) || 0
 	try {
@@ -161,6 +182,80 @@ export default function AdminDashboard() {
 				animate={reduceMotion ? false : { opacity: 1, y: 0 }}
 				transition={{ duration: 0.4, ease: 'easeOut' }}
 			>
+				<section className="relative overflow-hidden rounded-3xl border border-[color:var(--ring)] bg-[radial-gradient(circle_at_top,rgba(255,125,66,0.15),transparent_55%)] px-5 py-6 sm:px-6">
+					<div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[color:var(--primary-soft)] opacity-60 blur-3xl" />
+					<div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+						<div>
+							<p className="text-xs font-semibold uppercase tracking-[0.25em] text-muted">AliExpress-style command center</p>
+							<h2 className="mt-3 text-2xl font-semibold text-[color:var(--text)] sm:text-3xl">
+								Run your marketplace with precision control.
+							</h2>
+							<p className="mt-2 max-w-xl text-sm text-muted">
+								Monitor revenue, stock health, and fulfillment speed with live market signals.
+							</p>
+						</div>
+						<div className="grid w-full max-w-md gap-3 sm:grid-cols-3">
+							{DASHBOARD_ACTIONS.map((action) => {
+								const Icon = action.icon
+								return (
+									<button
+										key={action.label}
+										type="button"
+										className="rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface)] p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow"
+									>
+										<div className="flex items-center justify-between">
+											<span className="rounded-xl bg-[color:var(--primary-soft)] p-2 text-[color:var(--primary)]">
+												<Icon className="h-4 w-4" aria-hidden="true" />
+											</span>
+											<ArrowUpRight className="h-4 w-4 text-muted" aria-hidden="true" />
+										</div>
+										<p className="mt-3 text-sm font-semibold text-[color:var(--text)]">{action.label}</p>
+										<p className="mt-1 text-xs text-muted">{action.helper}</p>
+									</button>
+								)
+							})}
+						</div>
+					</div>
+					<div className="mt-6 grid gap-3 rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface)] p-4 sm:grid-cols-2 lg:grid-cols-4">
+						{PERFORMANCE_STRIP.map((item) => (
+							<div key={item.label} className="rounded-2xl bg-[color:var(--surface-strong)] px-4 py-3">
+								<p className="text-xs font-semibold uppercase tracking-widest text-muted">{item.label}</p>
+								<div className="mt-2 flex items-baseline justify-between">
+									<span className="text-lg font-semibold text-[color:var(--text)]">{item.value}</span>
+									<span className={`text-xs font-semibold ${item.delta.startsWith('-') ? 'text-rose-600' : 'text-emerald-600'}`}>
+										{item.delta}
+									</span>
+								</div>
+							</div>
+						))}
+					</div>
+				</section>
+
+				<section className="mt-6 overflow-hidden rounded-3xl border border-[color:var(--ring)] bg-[color:var(--surface)]">
+					<div className="flex items-center justify-between border-b border-[color:var(--ring)] px-5 py-3">
+						<div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+							<span className="h-2 w-2 rounded-full bg-emerald-500" />
+							Live market pulse
+						</div>
+						<span className="text-xs text-muted">Auto refresh</span>
+					</div>
+					<div className="relative overflow-hidden px-5 py-4">
+						<div className="admin-ticker gap-3 pr-6">
+							{[...LIVE_PULSE, ...LIVE_PULSE].map((pulse, index) => (
+								<div
+									key={`${pulse.label}-${index}`}
+									className="flex min-w-[240px] items-center gap-3 rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface-strong)] px-4 py-3"
+								>
+									<div className="rounded-xl bg-[color:var(--primary-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
+										{pulse.label}
+									</div>
+									<p className="text-sm font-semibold text-[color:var(--text)]">{pulse.detail}</p>
+								</div>
+							))}
+						</div>
+					</div>
+				</section>
+
 				<section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 					<StatCard title="Real-time revenue" value="$4.82M" delta={7.4} deltaLabel="WoW" icon={ChartLine} />
 					<StatCard title="Net margin" value="38.6%" delta={2.1} deltaLabel="MoM" icon={Layers} />

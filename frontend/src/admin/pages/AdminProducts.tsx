@@ -5,8 +5,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../../components/Navbar.jsx'
-import Footer from '../../components/Footer.jsx'
+import AdminLayout from '../../components/admin/AdminLayout.jsx'
 import {
 	useCreateProductMutation,
 	useDeleteProductMutation,
@@ -277,44 +276,39 @@ export default function AdminProducts() {
 	}
 
 	return (
-		<div className="min-h-screen bg-white text-slate-900">
-			<Navbar />
-			<main className="bg-slate-50">
-				<div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-					{feedback ? (
-						<div
-							className={
-								'mb-5 flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-base ring-1 ' +
-								(feedback.type === 'success'
-									? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
-									: 'bg-rose-50 text-rose-700 ring-rose-200')
-							}
+		<AdminLayout breadcrumbs={[{ label: 'Products', to: '/admin/products' }]}>
+			<div className="space-y-6">
+				{feedback ? (
+					<div
+						className={
+							'flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-base ring-1 ' +
+							(feedback.type === 'success'
+								? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+								: 'bg-rose-50 text-rose-700 ring-rose-200')
+						}
+					>
+						<span>{feedback.message}</span>
+						<button
+							type="button"
+							onClick={() => setFeedback(null)}
+							className="rounded-lg px-3 py-1.5 text-sm font-semibold ring-1 ring-current/25 hover:bg-white/40"
 						>
-							<span>{feedback.message}</span>
-							<button
-								type="button"
-								onClick={() => setFeedback(null)}
-								className="rounded-lg px-3 py-1.5 text-sm font-semibold ring-1 ring-current/25 hover:bg-white/40"
-							>
-								Dismiss
-							</button>
-						</div>
-					) : null}
+							Dismiss
+						</button>
+					</div>
+				) : null}
 
+				<section className="surface-card p-5 sm:p-6">
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 						<div>
-							<p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Admin panel</p>
-							<h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-								Product management
-							</h1>
-							<p className="mt-2 text-base text-slate-600">
-								Create, edit, delete, and seed products from backend.
-							</p>
+							<p className="text-xs font-semibold uppercase tracking-widest text-muted">Admin panel</p>
+							<h1 className="mt-2 text-2xl font-semibold text-[color:var(--text)] sm:text-3xl">Product management</h1>
+							<p className="mt-2 text-sm text-muted">Create, edit, delete, and seed products from backend.</p>
 						</div>
 						<div className="flex flex-wrap items-center gap-2">
 							<Link
 								to="/admin/orders"
-								className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2.5 text-base font-semibold text-slate-900 ring-1 ring-slate-200 transition-colors hover:bg-slate-50"
+								className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--text)] transition-colors hover:bg-[color:var(--surface-strong)]"
 							>
 								Orders
 							</Link>
@@ -322,17 +316,18 @@ export default function AdminProducts() {
 								type="button"
 								onClick={onSeed}
 								disabled={isBusy}
-								className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-base font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+								className="inline-flex items-center justify-center rounded-2xl bg-[color:var(--primary)] px-4 py-2 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(255,90,31,0.25)] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
 							>
 								{isSeeding ? 'Seeding...' : 'Seed sample data'}
 							</button>
 						</div>
 					</div>
+				</section>
 
-					<div className="mt-8 grid gap-6 lg:grid-cols-12">
+					<div className="grid gap-6 lg:grid-cols-12">
 						<section className="lg:col-span-5">
-							<form onSubmit={onSubmit} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-								<p className="text-base font-semibold text-slate-900">{editingId ? 'Update product' : 'Create product'}</p>
+							<form onSubmit={onSubmit} className="surface-card p-6 sm:p-7">
+								<p className="text-base font-semibold text-[color:var(--text)]">{editingId ? 'Update product' : 'Create product'}</p>
 								<div className="mt-4 grid gap-3">
 									{!editingId ? (
 										<input
@@ -340,7 +335,7 @@ export default function AdminProducts() {
 											placeholder="ID (optional, e.g. p_100)"
 											value={form.id}
 											onChange={onChange('id')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 									) : null}
 									<input
@@ -349,7 +344,7 @@ export default function AdminProducts() {
 										placeholder="Product name"
 										value={form.name}
 										onChange={onChange('name')}
-										className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 									/>
 									<input
 										type="number"
@@ -358,7 +353,7 @@ export default function AdminProducts() {
 										placeholder="Price"
 										value={form.price}
 										onChange={onChange('price')}
-										className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 									/>
 									<div className="grid gap-3 sm:grid-cols-2">
 										<input
@@ -367,7 +362,7 @@ export default function AdminProducts() {
 											placeholder="Category"
 											value={form.category}
 											onChange={onChange('category')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 										<input
 											type="number"
@@ -376,7 +371,7 @@ export default function AdminProducts() {
 											placeholder="Stock"
 											value={form.stocks}
 											onChange={onChange('stocks')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 									</div>
 									<div className="grid gap-3 sm:grid-cols-2">
@@ -385,14 +380,14 @@ export default function AdminProducts() {
 											placeholder="Seller ID (optional)"
 											value={form.sellerId}
 											onChange={onChange('sellerId')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 										<input
 											type="text"
 											placeholder="Seller name (optional)"
 											value={form.sellerName}
 											onChange={onChange('sellerName')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 									</div>
 									<div className="grid gap-3 sm:grid-cols-3">
@@ -402,21 +397,21 @@ export default function AdminProducts() {
 											placeholder="Deal price (optional)"
 											value={form.dealPrice}
 											onChange={onChange('dealPrice')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 										<input
 											type="text"
 											placeholder="Deal ends at (ISO, optional)"
 											value={form.dealEndsAt}
 											onChange={onChange('dealEndsAt')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 										<input
 											type="text"
 											placeholder="Deal label"
 											value={form.dealLabel}
 											onChange={onChange('dealLabel')}
-											className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+											className="h-12 w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 										/>
 									</div>
 									<textarea
@@ -424,16 +419,16 @@ export default function AdminProducts() {
 										value={form.variantsJson}
 										onChange={onChange('variantsJson')}
 										rows={3}
-										className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										className="w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 py-3 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 									/>
 
-									<label className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700">
-										<span className="font-semibold text-slate-900">Featured product</span>
+									<label className="flex items-center justify-between rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 py-3 text-base text-muted">
+										<span className="font-semibold text-[color:var(--text)]">Featured product</span>
 										<input
 											type="checkbox"
 											checked={form.isFeatured}
 											onChange={onChange('isFeatured')}
-											className="h-4 w-4 rounded border-slate-300 text-slate-950"
+											className="h-4 w-4 rounded border-[color:var(--ring)] text-[color:var(--primary)]"
 										/>
 									</label>
 
@@ -443,20 +438,23 @@ export default function AdminProducts() {
 										value={form.description}
 										onChange={onChange('description')}
 										rows={4}
-										className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										className="w-full rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 py-3 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 									/>
 
 									<div>
-										<label className="text-base font-semibold text-slate-900">Product image</label>
+										<label htmlFor="product-image" className="text-base font-semibold text-[color:var(--text)]">
+											Product image
+										</label>
 										<input
+											id="product-image"
 											type="file"
 											accept="image/*"
 											onChange={onImageFileChange}
-											className="mt-2 block w-full text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-900"
+											className="mt-2 block w-full text-sm text-muted file:mr-4 file:rounded-xl file:border-0 file:bg-[color:var(--primary)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:opacity-90"
 										/>
-										{isReadingImage ? <p className="mt-2 text-sm text-slate-500">Processing image…</p> : null}
+										{isReadingImage ? <p className="mt-2 text-sm text-muted">Processing image…</p> : null}
 										{imagePreview ? (
-											<img src={imagePreview} alt="Preview" className="mt-3 h-32 w-full rounded-lg object-cover" />
+											<img src={imagePreview} alt="Preview" className="mt-3 h-32 w-full rounded-2xl object-cover" />
 										) : null}
 									</div>
 
@@ -464,14 +462,14 @@ export default function AdminProducts() {
 										<button
 											type="submit"
 											disabled={isBusy}
-											className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-base font-semibold text-white hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+											className="inline-flex items-center justify-center rounded-2xl bg-[color:var(--primary)] px-4 py-2.5 text-base font-semibold text-white shadow-[0_16px_30px_rgba(255,90,31,0.25)] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
 										>
 											{editingId ? 'Update product' : 'Create product'}
 										</button>
 										<button
 											type="button"
 											onClick={resetForm}
-											className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-base font-semibold text-slate-700 hover:bg-slate-50"
+											className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--ring)] px-4 py-2.5 text-base font-semibold text-muted hover:bg-[color:var(--surface-strong)]"
 										>
 											Reset
 										</button>
@@ -482,17 +480,18 @@ export default function AdminProducts() {
 						</section>
 
 						<section className="lg:col-span-7">
-							<div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+							<div className="surface-card p-6 sm:p-7">
 								<div className="flex items-center justify-between">
 									<div>
-										<p className="text-base font-semibold text-slate-900">Products ({products.length})</p>
-										<p className="mt-1 text-sm text-slate-600">Manage product catalog entries.</p>
+										<p className="text-base font-semibold text-[color:var(--text)]">Products ({products.length})</p>
+										<p className="mt-1 text-sm text-muted">Manage product catalog entries.</p>
 									</div>
 									<input
+										aria-label="Search products"
 										value={search}
 										onChange={(event) => setSearch(event.target.value)}
 										placeholder="Search products..."
-										className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+										className="h-11 rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface)] px-4 text-base text-[color:var(--text)] placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
 									/>
 								</div>
 
@@ -500,7 +499,10 @@ export default function AdminProducts() {
 									{isLoading ? (
 										<div className="grid gap-3">
 											{Array.from({ length: 6 }).map((_, index) => (
-												<div key={index} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
+												<div
+													key={index}
+													className="h-24 animate-shimmer rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface-strong)]"
+												/>
 											))}
 										</div>
 									) : isError ? (
@@ -508,38 +510,38 @@ export default function AdminProducts() {
 											Could not load products.
 										</div>
 									) : sortedProducts.length === 0 ? (
-										<div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+										<div className="rounded-xl border border-[color:var(--ring)] bg-[color:var(--surface-strong)] p-4 text-sm text-muted">
 											No products match your search.
 										</div>
 									) : (
 										sortedProducts.map((product) => (
-											<div key={product.id} className="rounded-3xl border border-slate-200 bg-white p-5">
+											<div key={product.id} className="rounded-3xl border border-[color:var(--ring)] bg-[color:var(--surface)] p-5">
 												<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 													<div className="flex items-center gap-4">
 														<img
 															src={product.image}
 															alt={product.name}
-															className="h-16 w-16 rounded-2xl object-cover ring-1 ring-slate-200"
+															className="h-16 w-16 rounded-2xl object-cover ring-1 ring-[color:var(--ring)]"
 														/>
 														<div>
-															<p className="text-base font-semibold text-slate-900">{product.name}</p>
-															<p className="text-sm text-slate-500">ID: {product.id}</p>
-															<p className="text-sm text-slate-500">Category: {product.category}</p>
+															<p className="text-base font-semibold text-[color:var(--text)]">{product.name}</p>
+															<p className="text-sm text-muted">ID: {product.id}</p>
+															<p className="text-sm text-muted">Category: {product.category}</p>
 														</div>
 													</div>
-													<div className="text-base text-slate-700">
+													<div className="text-base text-muted">
 														<p>
-															<span className="font-semibold text-slate-900">Price:</span> ${product.price}
+															<span className="font-semibold text-[color:var(--text)]">Price:</span> ${product.price}
 														</p>
 														<p>
-															<span className="font-semibold text-slate-900">Stock:</span> {product.stocks}
+															<span className="font-semibold text-[color:var(--text)]">Stock:</span> {product.stocks}
 														</p>
 													</div>
 													<div className="flex flex-wrap gap-2">
 														<button
 															type="button"
 															onClick={() => startEdit(product)}
-															className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+															className="rounded-xl border border-[color:var(--ring)] px-4 py-2 text-sm font-semibold text-muted hover:bg-[color:var(--surface-strong)]"
 														>
 															Edit
 														</button>
@@ -560,9 +562,7 @@ export default function AdminProducts() {
 							</div>
 						</section>
 					</div>
-				</div>
-			</main>
-			<Footer />
-		</div>
+			</div>
+		</AdminLayout>
 	)
 }

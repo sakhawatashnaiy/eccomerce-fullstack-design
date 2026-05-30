@@ -260,6 +260,29 @@ async function updateOrderById(orderId, patch) {
 		}
 	}
 
+	// Allow updating tracking metadata (optional)
+	if (patch?.tracking && typeof patch.tracking === 'object') {
+		next.tracking = {
+			...(current.tracking || {}),
+			...(patch.tracking || {}),
+		}
+	}
+
+	// Append admin notes for audit trail (optional)
+	if (patch?.adminNote) {
+		const note = String(patch.adminNote || '').trim()
+		if (note) {
+			const history = Array.isArray(current.adminNotes) ? current.adminNotes : []
+			history.push({
+				note,
+				label: String(patch.adminNoteLabel || 'Review'),
+				by: String(patch.adminNoteBy || 'admin'),
+				at: new Date().toISOString(),
+			})
+			next.adminNotes = history.slice(-20)
+		}
+	}
+
 	if (Object.keys(next).length === 0) {
 		return { id: doc.id, ...current }
 	}
