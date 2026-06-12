@@ -319,7 +319,7 @@ export default function AdminLayout({ children, breadcrumbs = [] }) {
 							{collapsed ? null : (
 								<span className="leading-tight">
 									<span className="block">Ashnaiy Express </span>
-									<span className="mt-0.5 block text-xs font-semibold text-muted">inter conected world supplier</span>
+									<span className="mt-0.5 block text-xs font-semibold text-muted">Connected World Supplie</span>
 								</span>
 							)}
 						</Link>

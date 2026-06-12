@@ -131,7 +131,7 @@ const HeroSlider = memo(function HeroSlider({ slides }) {
 							<img
 								src={slide.image}
 								alt="Promotion"
-								className="relative aspect-[4/3] w-full rounded-2xl object-cover ring-1 ring-white/10"
+								className="relative aspect-[4/3] w-full rounded-2xl object-contain bg-white ring-1 ring-white/10"
 								loading="lazy"
 							/>
 						) : (
